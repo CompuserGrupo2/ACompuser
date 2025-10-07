@@ -4,6 +4,7 @@ import Servicios from "./src/views/Servicios";
 import Encabezado from "./src/Componentes/Encabezado";
 import ListaServicios from "./src/Componentes/Servicios/ListaServicios";
 import FormularioCalificacion from "./src/Componentes/Servicios/FormularioCalificacion";
+import Equipos from "./src/views/Equipos";
 
 export default function App() {
   const [pantalla, setPantalla] = useState("servicios");
@@ -16,6 +17,8 @@ export default function App() {
         return <ListaServicios />;
       case "calificacion":
         return <FormularioCalificacion />;
+      case "equipo":
+        return <Equipos />;
       default:
         return <Servicios />;
     }
@@ -50,6 +53,14 @@ export default function App() {
           onPress={() => setPantalla("calificacion")}
         >
           <Text style={styles.textoBoton}>Calificaciones</Text>
+        </TouchableOpacity>
+        
+              {/* Equipos */}
+        <TouchableOpacity
+          style={[styles.boton, pantalla === "equipo" && styles.activo]}
+          onPress={() => setPantalla("equipo")}
+        >
+          <Text style={styles.textoBoton}>Equipos</Text>
         </TouchableOpacity>
       </View>
 
