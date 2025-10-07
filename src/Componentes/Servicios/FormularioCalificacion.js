@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
-import { db } from "../../database/firebaseconfig";
+import { db } from "../../Database/firebaseconfig";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { Picker } from "@react-native-picker/picker"; //libreria de selector de lista
 

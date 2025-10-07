@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Modal, TextInput, StyleSheet } from "react-native";
-import { db } from "../../database/firebaseconfig";
+import { db } from "../../Database/firebaseconfig";
 import { doc, updateDoc } from "firebase/firestore";
 
 const BotonEditarServicio = ({ id, descripcionInicial, costoInicial, cargarDatos }) => {

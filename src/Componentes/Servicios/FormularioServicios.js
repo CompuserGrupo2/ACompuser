@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, TextInput, Button, StyleSheet, Text, Alert } from "react-native";
-import { db } from "../../database/firebaseconfig";
+import { db } from "../../Database/firebaseconfig";
 import { collection, addDoc } from "firebase/firestore";
 
 const FormularioServicios = ({ cargarDatos }) => {
