@@ -3,19 +3,19 @@ import { View, Text, StyleSheet, FlatList } from "react-native";
 import { db } from "../../Database/firebaseconfig";
 import { collection, getDocs } from "firebase/firestore";
 
-const ListaServicios = () => {
-  const [servicios, setServicios] = useState([]);
+const ListaEquipos = () => {
+  const [equipos, setEquipos] = useState([]);
 
   const cargarDatos = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "Servicios"));
+      const querySnapshot = await getDocs(collection(db, "EquipoComputarizado"));
       const datos = [];
       querySnapshot.forEach((doc) => {
         datos.push({ id: doc.id, ...doc.data() });
       });
-      setServicios(datos);
+      setEquipos(datos);
     } catch (error) {
-      console.error("Error al cargar servicios:", error);
+      console.error("Error al cargar equipos:", error);
     }
   };
 
@@ -25,17 +25,19 @@ const ListaServicios = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.cardRow}>
-      <Text style={styles.descripcion}>{item.descripcion}</Text>
-      <Text style={styles.costo}>C$ {item.costo}</Text>
+      <Text style={styles.color}>{item.color}</Text>
+      <Text style={styles.marca}>{item.marca}</Text>
+      <Text style={styles.modelo}>{item.modelo}</Text>
+      <Text style={styles.tipo}>{item.tipo}</Text>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Catálogo de Servicios</Text>
+      <Text style={styles.titulo}>Catálogo de Equipos</Text>
 
       <FlatList
-        data={servicios}
+        data={equipos}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
       />
@@ -88,4 +90,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ListaServicios;
+export default ListaEquipos;
