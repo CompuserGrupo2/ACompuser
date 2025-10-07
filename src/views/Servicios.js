@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { db } from "../database/firebaseconfig";
+import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import ListaServicios from "../Componentes/Servicios/ListaServicios";
 import FormularioServicios from "../Componentes/Servicios/FormularioServicios";

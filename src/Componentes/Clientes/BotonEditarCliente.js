@@ -3,22 +3,22 @@ import { View, Text, TouchableOpacity, Modal, TextInput, StyleSheet } from "reac
 import { db } from "../../Database/firebaseconfig";
 import { doc, updateDoc } from "firebase/firestore";
 
-const BotonEditarServicio = ({ id, descripcionInicial, costoInicial, cargarDatos }) => {
+const BotonEditarCliente = ({ id, nombreInicial, emailInicial, cargarDatos }) => {
   const [visible, setVisible] = useState(false);
-  const [descripcion, setDescripcion] = useState(descripcionInicial);
-  const [costo, setCosto] = useState(costoInicial ? costoInicial.toString() : "");
+  const [nombre, setNombre] = useState(nombreInicial);
+  const [email, setEmail] = useState(emailInicial || "");
 
   const guardarCambios = async () => {
     try {
-      const servicioRef = doc(db, "Servicios", id);
-      await updateDoc(servicioRef, {
-        descripcion: descripcion,
-        costo: Number(costo),
+      const clienteRef = doc(db, "Clientes", id);
+      await updateDoc(clienteRef, {
+        nombre: nombre,
+        email: email,
       });
       setVisible(false);
       cargarDatos();
     } catch (error) {
-      console.error("Error al editar servicio:", error);
+      console.error("Error al editar cliente:", error);
     }
   };
 
@@ -31,20 +31,20 @@ const BotonEditarServicio = ({ id, descripcionInicial, costoInicial, cargarDatos
       <Modal visible={visible} transparent animationType="fade">
         <View style={styles.overlay}>
           <View style={styles.modal}>
-            <Text style={styles.titulo}>Editar Servicio</Text>
+            <Text style={styles.titulo}>Editar Cliente</Text>
 
             <TextInput
               style={styles.input}
-              placeholder="Descripción"
-              value={descripcion}
-              onChangeText={setDescripcion}
+              placeholder="Nombre"
+              value={nombre}
+              onChangeText={setNombre}
             />
             <TextInput
               style={styles.input}
-              placeholder="Costo"
-              keyboardType="numeric"
-              value={costo}
-              onChangeText={setCosto}
+              placeholder="Email"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
             />
 
             <View style={styles.fila}>
@@ -77,4 +77,4 @@ const styles = StyleSheet.create({
   textoAccion: { color: "white", fontWeight: "bold" },
 });
 
-export default BotonEditarServicio;
+export default BotonEditarCliente;

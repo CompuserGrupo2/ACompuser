@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import { db } from "../../database/firebaseconfig";
+import { db } from "../../Database/firebaseconfig";
 import { collection, getDocs } from "firebase/firestore";
 
 const ListaServicios = () => {
