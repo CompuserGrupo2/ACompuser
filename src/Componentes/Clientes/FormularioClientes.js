@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, StyleSheet, Text, Alert } from "react-native";
+import { View, TextInput, Text, StyleSheet, Alert, TouchableHighlight } from "react-native";
+import { Picker } from '@react-native-picker/picker';
 import { db } from "../../Database/firebaseconfig";
 import { collection, addDoc } from "firebase/firestore";
 
@@ -9,6 +10,8 @@ const FormularioClientes = ({ cargarDatos }) => {
   const [cedula, setCedula] = useState("");
   const [telefono, setTelefono] = useState("");
   const [tipoCliente, setTipoCliente] = useState("");
+
+  const tiposValidos = ["Regular", "Nuevo", "VIP", "Premium"];
 
   const guardarCliente = async () => {
     if (nombre.trim() && apellido.trim() && cedula.trim() && telefono.trim() && tipoCliente.trim()) {
@@ -20,7 +23,6 @@ const FormularioClientes = ({ cargarDatos }) => {
           telefono: telefono.trim(),
           tipo_cliente: tipoCliente.trim(),
         });
-        // Limpiar campos después de guardar
         setNombre("");
         setApellido("");
         setCedula("");
@@ -38,12 +40,54 @@ const FormularioClientes = ({ cargarDatos }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>Registro de Clientes</Text>
-      <TextInput style={styles.input} placeholder="Nombre" value={nombre} onChangeText={setNombre} />
-      <TextInput style={styles.input} placeholder="Apellido" value={apellido} onChangeText={setApellido} />
-      <TextInput style={styles.input} placeholder="Cédula" value={cedula} onChangeText={setCedula} keyboardType="numeric" />
-      <TextInput style={styles.input} placeholder="Teléfono" value={telefono} onChangeText={setTelefono} keyboardType="phone-pad" />
-      <TextInput style={styles.input} placeholder="Tipo de Cliente" value={tipoCliente} onChangeText={setTipoCliente} />
-      <Button title="Guardar" onPress={guardarCliente} />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Nombre"
+        value={nombre}
+        onChangeText={setNombre}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Apellido"
+        value={apellido}
+        onChangeText={setApellido}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Cédula"
+        value={cedula}
+        onChangeText={setCedula}
+        keyboardType="numeric"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Teléfono"
+        value={telefono}
+        onChangeText={setTelefono}
+        keyboardType="phone-pad"
+      />
+
+      <Text style={styles.label}>Tipo de Cliente</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={tipoCliente}
+          onValueChange={(itemValue) => setTipoCliente(itemValue)}
+        >
+          <Picker.Item label="Seleccione tipo" value="" />
+          {tiposValidos.map((t) => (
+            <Picker.Item key={t} label={t} value={t} />
+          ))}
+        </Picker>
+      </View>
+
+      <TouchableHighlight
+        style={styles.boton}
+        underlayColor="#0056b3"
+        onPress={guardarCliente}
+      >
+        <Text style={styles.textoBoton}>Guardar</Text>
+      </TouchableHighlight>
     </View>
   );
 };
@@ -52,6 +96,24 @@ const styles = StyleSheet.create({
   container: { padding: 20 },
   titulo: { fontSize: 22, fontWeight: "bold", marginBottom: 10 },
   input: { borderWidth: 1, borderColor: "#ccc", padding: 10, marginBottom: 10 },
+  label: { marginBottom: 5, fontWeight: "bold" },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  boton: {
+    backgroundColor: "#007BFF",
+    padding: 12,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  textoBoton: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
 
 export default FormularioClientes;

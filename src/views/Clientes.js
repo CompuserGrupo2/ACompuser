@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
-import ListaClientes from "../Componentes/Clientes/ListaClientes";
-import FormularioClientes from "../Componentes/Clientes/FormularioClientes";
-import TablaClientes from "../Componentes/Clientes/TablaClientes";
+import FormularioClientes from '../Componentes/Clientes/FormularioClientes';
+import ListaClientes from '../Componentes/Clientes/ListaClientes';
+import TablaClientes from '../Componentes/Clientes/TablaClientes';
 
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
@@ -15,7 +15,7 @@ const Clientes = () => {
       const data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setClientes(data);
     } catch (error) {
-      console.error("Error al obtener clientes: ", error);
+      console.error("Error al obtener clientes:", error);
     }
   };
 
@@ -33,15 +33,11 @@ const Clientes = () => {
   }, []);
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <FormularioClientes cargarDatos={cargarDatos} />
       <ListaClientes clientes={clientes} />
-      <TablaClientes
-        clientes={clientes}
-        eliminarCliente={eliminarCliente}
-        cargarDatos={cargarDatos}
-      />
-    </ScrollView>
+      <TablaClientes clientes={clientes} eliminarCliente={eliminarCliente} cargarDatos={cargarDatos} />
+    </View>
   );
 };
 

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
-import ListaServicios from "../Componentes/Servicios/ListaServicios";
 import FormularioServicios from "../Componentes/Servicios/FormularioServicios";
 import TablaServicios from "../Componentes/Servicios/TablaServicios";
 
@@ -35,7 +34,6 @@ const Servicios = () => {
   return (
     <View style={styles.container}>
       <FormularioServicios cargarDatos={cargarDatos} />
-      <ListaServicios servicios={servicios} />
       <TablaServicios servicios={servicios} eliminarServicio={eliminarServicio} cargarDatos={cargarDatos} />
     </View>
   );
