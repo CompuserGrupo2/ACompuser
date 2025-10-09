@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 import { db } from "../../Database/firebaseconfig";
 import { collection, addDoc, getDocs } from "firebase/firestore";
-import { Picker } from "@react-native-picker/picker"; //libreria de selector de lista
+import { Picker } from "@react-native-picker/picker"; // Librería del selector
 
 const FormularioCalificacion = ({ cargarDatos }) => {
   const [calidad, setCalidad] = useState("");
@@ -11,7 +11,7 @@ const FormularioCalificacion = ({ cargarDatos }) => {
   const [servicioSeleccionado, setServicioSeleccionado] = useState("");
   const [cargando, setCargando] = useState(true);
 
-  // Cargar los servicios disponibles de Firestore
+  // 🔹 Cargar los servicios desde Firestore
   const cargarServicios = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "Servicios"));
@@ -31,7 +31,7 @@ const FormularioCalificacion = ({ cargarDatos }) => {
     cargarServicios();
   }, []);
 
-  // Guardar calificación dentro del servicio seleccionado
+  // 🔹 Guardar calificación en la subcolección del servicio
   const agregarCalificacion = async () => {
     if (!servicioSeleccionado || !calidad || !comentario) {
       alert("Por favor completa todos los campos y selecciona un servicio.");
@@ -44,11 +44,12 @@ const FormularioCalificacion = ({ cargarDatos }) => {
         comentario,
         fecha_calificacion: new Date().toISOString().split("T")[0],
       });
+
       alert("Calificación registrada correctamente ✅");
       setCalidad("");
       setComentario("");
       setServicioSeleccionado("");
-      cargarDatos && cargarDatos();
+      cargarDatos && cargarDatos(); // refresca la lista si se pasa función
     } catch (error) {
       console.error("Error al agregar calificación:", error);
     }
@@ -67,7 +68,7 @@ const FormularioCalificacion = ({ cargarDatos }) => {
     <View style={styles.container}>
       <Text style={styles.titulo}>Agregar Calificación</Text>
 
-      {/* Selector de servicios */}
+      {/* 🔸 Selector de servicios */}
       <View style={styles.selectorContainer}>
         <Picker
           selectedValue={servicioSeleccionado}
@@ -84,17 +85,24 @@ const FormularioCalificacion = ({ cargarDatos }) => {
           ))}
         </Picker>
       </View>
-        
-        {/* Calidad */}
-      <TextInput
-        style={styles.input}
-        placeholder="Calidad del servicio (1-5)"
-        keyboardType="numeric"
-        value={calidad}
-        onChangeText={setCalidad}
-      />
 
-        {/* Comentario */}
+      {/* 🔸 Selector de calidad (1 a 5) */}
+      <View style={styles.selectorContainer}>
+        <Picker
+          selectedValue={calidad}
+          onValueChange={(itemValue) => setCalidad(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="-- Calificar servicio del (1-5) --" value="" />
+          <Picker.Item label="1 - Muy mala" value="1" />
+          <Picker.Item label="2 - Mala" value="2" />
+          <Picker.Item label="3 - Regular" value="3" />
+          <Picker.Item label="4 - Buena" value="4" />
+          <Picker.Item label="5 - Excelente" value="5" />
+        </Picker>
+      </View>
+
+      {/* 🔸 Comentario */}
       <TextInput
         style={[styles.input, styles.textArea]}
         placeholder="Comentario"
@@ -116,10 +124,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     padding: 20,
     marginVertical: 20,
-    marginHorizontal: 18, 
+    marginHorizontal: 18,
     borderRadius: 12,
     borderLeftWidth: 5,
-    borderLeftColor: "#fbfcfdff",
+    borderLeftColor: "#fcfcffff",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.15,
@@ -131,16 +139,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#0D0D0D",
     marginBottom: 10,
-    textAlign: "left", 
+    textAlign: "left",
   },
   selectorContainer: {
     marginBottom: 10,
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#0D0D0D",
-    marginBottom: 5,
   },
   picker: {
     backgroundColor: "#faf7f7f8",
@@ -165,7 +167,7 @@ const styles = StyleSheet.create({
   boton: {
     backgroundColor: "#369AD9",
     padding: 10,
-    borderRadius: 1,
+    borderRadius: 6,
   },
   textoBoton: {
     color: "#fff",
