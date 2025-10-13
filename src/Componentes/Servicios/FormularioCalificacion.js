@@ -134,6 +134,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 4,
   },
+
   titulo: {
     fontSize: 22,
     fontWeight: "bold",
@@ -141,9 +142,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "left",
   },
+
   selectorContainer: {
     marginBottom: 10,
   },
+
   picker: {
     backgroundColor: "#faf7f7f8",
     borderRadius: 8,
@@ -151,6 +154,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     color: "#0D0D0D",
   },
+
   input: {
     backgroundColor: "#FFFFFF",
     borderColor: "#bdbdc7ff",
@@ -160,21 +164,25 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 15,
   },
+
   textArea: {
     height: 80,
     textAlignVertical: "top",
   },
+
   boton: {
     backgroundColor: "#369AD9",
     padding: 10,
     borderRadius: 6,
   },
+
   textoBoton: {
     color: "#fff",
     fontSize: 16,
     textAlign: "center",
     fontWeight: "600",
   },
+  
   loading: {
     flex: 1,
     justifyContent: "center",

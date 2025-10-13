@@ -9,10 +9,7 @@ const ListaEquipos = () => {
   const cargarDatos = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "EquipoComputarizado"));
-      const datos = [];
-      querySnapshot.forEach((doc) => {
-        datos.push({ id: doc.id, ...doc.data() });
-      });
+      const datos = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setEquipos(datos);
     } catch (error) {
       console.error("Error al cargar equipos:", error);
@@ -24,22 +21,24 @@ const ListaEquipos = () => {
   }, []);
 
   const renderItem = ({ item }) => (
-    <View style={styles.cardRow}>
-      <Text style={styles.color}>{item.color}</Text>
-      <Text style={styles.marca}>{item.marca}</Text>
-      <Text style={styles.modelo}>{item.modelo}</Text>
-      <Text style={styles.tipo}>{item.tipo}</Text>
+    <View style={styles.card}>
+      <Text style={styles.titulo}>{item.marca} {item.modelo}</Text>
+      <Text style={styles.detalle}>Color: {item.color}</Text>
+      <Text style={styles.detalle}>Tipo: {item.tipo}</Text>
+      <Text style={styles.cliente}>
+        Cliente: {item.cliente ? `${item.cliente.nombre} ${item.cliente.apellido}` : "Sin cliente"}
+      </Text>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Catálogo de Equipos</Text>
-
+      <Text style={styles.header}>Lista de Equipos</Text>
       <FlatList
         data={equipos}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
+        contentContainerStyle={{ paddingBottom: 20 }}
       />
     </View>
   );
@@ -47,47 +46,42 @@ const ListaEquipos = () => {
 
 const styles = StyleSheet.create({
   container: { 
+    flex: 1, 
     padding: 15
   },
   
-  titulo: { 
+  header: { 
     fontSize: 22, 
     fontWeight: "bold", 
-    marginBottom: 12, 
-    color: "#0D0D0D", 
-    textAlign: "left", 
+    marginBottom: 15, 
+    textAlign: "left" 
   },
-
-  // Estilo tipo catálogo pero compacto
-  cardRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+  
+  card: {
     backgroundColor: "#fff",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    marginBottom: 8,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: "#7E84F2",
-    elevation: 2, // sombra en Android
-    shadowColor: "#000", // sombra en iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 12,
+  },
+  
+  titulo: { 
+    fontSize: 18, 
+    fontWeight: "bold", 
+    marginBottom: 6 
   },
 
-  descripcion: { 
-    fontSize: 15, 
-    fontWeight: "500", 
-    color: "#0D0D0D", 
-    flex: 1 
+  detalle: { 
+    fontSize: 14, 
+    marginBottom: 3, 
+    color: "#333" 
   },
-  costo: { 
-    fontSize: 15, 
+
+  cliente: 
+  { fontSize: 14, 
     fontWeight: "bold", 
-    color: "#369AD9" 
-  },
+    color: "#7E84F2", 
+    marginTop: 5 
+  }
 });
 
 export default ListaEquipos;

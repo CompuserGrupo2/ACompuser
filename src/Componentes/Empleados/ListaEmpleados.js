@@ -3,16 +3,16 @@ import { View, Text, StyleSheet, FlatList } from "react-native";
 import { db } from "../../Database/firebaseconfig";
 import { collection, getDocs } from "firebase/firestore";
 
-const ListaClientes = () => {
-  const [clientes, setClientes] = useState([]);
+const ListaEmpleados = () => {
+  const [empleados, setEmpleados] = useState([]);
 
   const cargarDatos = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "Clientes"));
+      const querySnapshot = await getDocs(collection(db, "Empleados"));
       const datos = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setClientes(datos);
+      setEmpleados(datos);
     } catch (error) {
-      console.error("Error al cargar clientes:", error);
+      console.error("Error al cargar empleados:", error);
     }
   };
 
@@ -25,15 +25,14 @@ const ListaClientes = () => {
       <Text style={styles.titulo}>{item.nombre} {item.apellido}</Text>
       <Text style={styles.detalle}>Cédula: {item.cedula}</Text>
       <Text style={styles.detalle}>Teléfono: {item.telefono}</Text>
-      <Text style={styles.cliente}>Tipo: {item.tipo_cliente}</Text>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Lista de Clientes</Text>
+      <Text style={styles.header}>Lista de Empleados</Text>
       <FlatList
-        data={clientes}
+        data={empleados}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 20 }}
@@ -52,7 +51,7 @@ const styles = StyleSheet.create({
     fontSize: 22, 
     fontWeight: "bold", 
     marginBottom: 15, 
-    textAlign: "Left" 
+    textAlign: "left" 
   },
 
   card: {
@@ -60,26 +59,31 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 12,
+    elevation: 2, // para sombra en Android
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
 
-  titulo: 
-  { fontSize: 18, 
+  titulo: { 
+    fontSize: 18, 
     fontWeight: "bold", 
     marginBottom: 6 
   },
 
-  detalle: 
-  { fontSize: 14, 
+  detalle: { 
+    fontSize: 14, 
     marginBottom: 3, 
     color: "#333" 
   },
 
-  cliente: { 
+  tipo: { 
     fontSize: 14, 
     fontWeight: "bold", 
     color: "#7E84F2", 
     marginTop: 5 
-  }
+  },
 });
 
-export default ListaClientes;
+export default ListaEmpleados;

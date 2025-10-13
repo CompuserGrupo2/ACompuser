@@ -3,22 +3,28 @@ import { View, Text, TouchableOpacity, Modal, TextInput, StyleSheet } from "reac
 import { db } from "../../Database/firebaseconfig";
 import { doc, updateDoc } from "firebase/firestore";
 
-const BotonEditarCliente = ({ id, nombreInicial, emailInicial, cargarDatos }) => {
+const BotonEditarEmpleado = ({ id, nombreInicial, apellidoInicial, cedulaInicial, telefonoInicial, direccionInicial, cargarDatos }) => {
   const [visible, setVisible] = useState(false);
   const [nombre, setNombre] = useState(nombreInicial);
-  const [email, setEmail] = useState(emailInicial || "");
+  const [apellido, setApellido] = useState(apellidoInicial);
+  const [cedula, setCedula] = useState(cedulaInicial);
+  const [telefono, setTelefono] = useState(telefonoInicial);
+  const [direccion, setDireccion] = useState(direccionInicial);
 
   const guardarCambios = async () => {
     try {
-      const clienteRef = doc(db, "Clientes", id);
-      await updateDoc(clienteRef, {
-        nombre: nombre,
-        email: email,
+      const empleadoRef = doc(db, "Empleados", id);
+      await updateDoc(empleadoRef, {
+        nombre,
+        apellido,
+        cedula,
+        telefono,
+        direccion,
       });
       setVisible(false);
       cargarDatos();
     } catch (error) {
-      console.error("Error al editar cliente:", error);
+      console.error("Error al editar empleado:", error);
     }
   };
 
@@ -31,7 +37,7 @@ const BotonEditarCliente = ({ id, nombreInicial, emailInicial, cargarDatos }) =>
       <Modal visible={visible} transparent animationType="fade">
         <View style={styles.overlay}>
           <View style={styles.modal}>
-            <Text style={styles.titulo}>Editar Cliente</Text>
+            <Text style={styles.titulo}>Editar Empleado</Text>
 
             <TextInput
               style={styles.input}
@@ -41,10 +47,28 @@ const BotonEditarCliente = ({ id, nombreInicial, emailInicial, cargarDatos }) =>
             />
             <TextInput
               style={styles.input}
-              placeholder="Email"
-              keyboardType="email-address"
-              value={email}
-              onChangeText={setEmail}
+              placeholder="Apellido"
+              value={apellido}
+              onChangeText={setApellido}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Cédula"
+              value={cedula}
+              onChangeText={setCedula}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Teléfono"
+              keyboardType="phone-pad"
+              value={telefono}
+              onChangeText={setTelefono}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Dirección"
+              value={direccion}
+              onChangeText={setDireccion}
             />
 
             <View style={styles.fila}>
@@ -77,4 +101,4 @@ const styles = StyleSheet.create({
   textoAccion: { color: "white", fontWeight: "bold" },
 });
 
-export default BotonEditarCliente;
+export default BotonEditarEmpleado;

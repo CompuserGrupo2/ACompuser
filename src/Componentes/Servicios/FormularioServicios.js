@@ -36,9 +36,22 @@ const FormularioServicios = ({ cargarDatos }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
-  titulo: { fontSize: 22, fontWeight: "bold", marginBottom: 10 },
-  input: { borderWidth: 1, borderColor: "#ccc", padding: 10, marginBottom: 10 },
+  container: { 
+    padding: 20 
+  },
+  
+  titulo: { 
+    fontSize: 22, 
+    fontWeight: "bold", 
+    marginBottom: 10 
+  },
+
+  input: { 
+    borderWidth: 1, 
+    borderColor: "#ccc", 
+    padding: 10, 
+    marginBottom: 10 
+  },
 });
 
 export default FormularioServicios;

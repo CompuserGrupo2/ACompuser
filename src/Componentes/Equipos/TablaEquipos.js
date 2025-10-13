@@ -12,6 +12,7 @@ const TablaEquipos = ({ equipos, eliminarEquipo }) => {
         <Text style={[styles.celda, styles.textoEncabezado]}>Marca</Text>
         <Text style={[styles.celda, styles.textoEncabezado]}>Modelo</Text>
         <Text style={[styles.celda, styles.textoEncabezado]}>Tipo</Text>
+        <Text style={[styles.celda, styles.textoEncabezado]}>Cliente</Text>
         <Text style={[styles.celda, styles.textoEncabezado]}>Acciones</Text>
       </View>
 
@@ -22,6 +23,7 @@ const TablaEquipos = ({ equipos, eliminarEquipo }) => {
             <Text style={styles.celda}>{item.marca}</Text>
             <Text style={styles.celda}>{item.modelo}</Text>
             <Text style={styles.celda}>{item.tipo}</Text>
+            <Text style={styles.celda}>{item.cliente ? item.cliente.nombre : "Sin cliente"}</Text>
             <View style={styles.celdaAcciones}>
               <BotonEliminarEquipo
                 id={item.id}
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
   
   textoEncabezado: {
     fontWeight: "bold",
-    fontSize: 17,
+    fontSize: 16,
     textAlign: "center",
   },
 });

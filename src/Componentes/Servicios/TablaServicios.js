@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
 
   celda: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     textAlign: "center",
   },
 
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   
   textoEncabezado: {
     fontWeight: "bold",
-    fontSize: 17,
+    fontSize: 16,
     textAlign: "center",
   },
 });
