@@ -66,7 +66,7 @@ export default function App() {
           <Text style={styles.textoBoton}>Calificaciones</Text>
         </TouchableOpacity>
         
-              {/* Equipos */}
+        {/* Equipos */}
         <TouchableOpacity
           style={[styles.boton, pantalla === "equipo" && styles.activo]}
           onPress={() => setPantalla("equipo")}
