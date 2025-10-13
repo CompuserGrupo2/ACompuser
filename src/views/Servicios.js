@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Button } from "react-native";
 import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import FormularioServicios from "../Componentes/Servicios/FormularioServicios";
 import TablaServicios from "../Componentes/Servicios/TablaServicios";
 
-const Servicios = () => {
+const Servicios = ({ setPantalla }) => {
   const [servicios, setServicios] = useState([]);
 
   const cargarDatos = async () => {
@@ -35,12 +35,19 @@ const Servicios = () => {
     <View style={styles.container}>
       <FormularioServicios cargarDatos={cargarDatos} />
       <TablaServicios servicios={servicios} eliminarServicio={eliminarServicio} cargarDatos={cargarDatos} />
+      <View style={styles.buttonContainer}>
+        <Button title="Ir a Empleados" onPress={() => setPantalla('empleados')} />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
+  buttonContainer: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
 });
 
 export default Servicios;

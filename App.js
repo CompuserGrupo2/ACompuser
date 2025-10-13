@@ -6,6 +6,7 @@ import ListaServicios from "./src/Componentes/Servicios/ListaServicios";
 import FormularioCalificacion from "./src/Componentes/Servicios/FormularioCalificacion";
 import Equipos from "./src/views/Equipos";
 import Clientes from "./src/views/Clientes";
+import Empleados from "./src/views/Empleados";
 
 export default function App() {
   const [pantalla, setPantalla] = useState("catalogo");
@@ -13,17 +14,19 @@ export default function App() {
   const renderPantalla = () => {
     switch (pantalla) {
       case "cliente":
-        return <Clientes />;
+        return <Clientes setPantalla={setPantalla} />;
       case "servicios":
-        return <Servicios />;
+        return <Servicios setPantalla={setPantalla} />;
       case "catalogo":
         return <ListaServicios />;
       case "calificacion":
         return <FormularioCalificacion />;
       case "equipo":
         return <Equipos />;
+      case "empleados":
+        return <Empleados setPantalla={setPantalla} />;
       default:
-        return <Servicios />;
+        return <Servicios setPantalla={setPantalla} />;
     }
   };
 
@@ -50,6 +53,14 @@ export default function App() {
           <Text style={styles.textoBoton}>Servicios</Text>
         </TouchableOpacity>
 
+        {/* Empleados */}
+        <TouchableOpacity
+          style={[styles.boton, pantalla === "empleados" && styles.activo]}
+          onPress={() => setPantalla("empleados")}
+        >
+          <Text style={styles.textoBoton}>Empleados</Text>
+        </TouchableOpacity>
+
         {/* Catálogo */}
         <TouchableOpacity
           style={[styles.boton, pantalla === "catalogo" && styles.activo]}
@@ -66,7 +77,7 @@ export default function App() {
           <Text style={styles.textoBoton}>Calificaciones</Text>
         </TouchableOpacity>
         
-              {/* Equipos */}
+        {/* Equipos */}
         <TouchableOpacity
           style={[styles.boton, pantalla === "equipo" && styles.activo]}
           onPress={() => setPantalla("equipo")}
