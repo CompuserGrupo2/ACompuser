@@ -40,9 +40,6 @@ const Servicios = ({ setPantalla }) => {
         eliminarServicio={eliminarServicio}
         cargarDatos={cargarDatos}
       />
-      <View style={styles.buttonContainer}>
-        <Button title="Ir a Empleados" onPress={() => setPantalla('empleados')} />
-      </View>
     </View>
   );
 

@@ -28,7 +28,7 @@ const SelectorClientes = ({ onClienteSeleccionado }) => {
       >
         <Picker.Item label="Selecciona un cliente" value={null} />
         {clientes.map(cliente => (
-          <Picker.Item key={cliente.id} label={cliente.nombre} value={cliente} />
+          <Picker.Item key={cliente.id} label={`${cliente.nombre} ${cliente.apellido}`} value={cliente} />
         ))}
       </Picker>
     </View>

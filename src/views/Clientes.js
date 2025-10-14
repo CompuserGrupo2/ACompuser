@@ -42,9 +42,6 @@ const Clientes = ({ setPantalla }) => {
         eliminarCliente={eliminarCliente}
         cargarDatos={cargarDatos}
       />
-      <View style={styles.buttonContainer}>
-        <Button title="Ir a Equipos" onPress={() => setPantalla('equipo')} />
-      </View>
     </View>
   );
 

@@ -37,9 +37,6 @@ const Empleados = ({ setPantalla }) => {
       <FormularioEmpleados cargarDatos={cargarDatos} />
       <ListaEmpleados empleados={empleados} />
       <TablaEmpleados empleados={empleados} eliminarEmpleado={eliminarEmpleado} cargarDatos={cargarDatos} />
-      <View style={styles.buttonContainer}>
-        <Button title="Volver a Servicios" onPress={() => setPantalla('servicios')} />
-      </View>
     </View>
   );
 
