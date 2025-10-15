@@ -10,6 +10,7 @@ import Equipos from "../views/Equipos";
 import Servicios from "../views/Servicios";
 import ListaServicios from "./Servicios/ListaServicios";
 import Home from "../views/Home";
+import Citas from "../views/Citas";
 import FormularioCalificacion from "./Servicios/FormularioCalificacion";
 
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -33,6 +34,10 @@ function StackDetailServicios(){
         component={ListaServicios}
       />
       <DetailsServiciosNavigator.Screen
+        name="Citas"
+        component={Citas}
+      />
+      <DetailsServiciosNavigator.Screen
         name="calificaciones"
         component={FormularioCalificacion}
       />
@@ -52,6 +57,7 @@ function MyTabs(){
         name="Home"
         component={Home}
         options={{
+          title: 'Acerca de la Empresa',
           tabBarLabel: 'Inicio',
           tabBarIcon: ({color, size})=> (
             <AntDesign name="home" size={24} color={color} />
@@ -85,6 +91,16 @@ function MyTabs(){
           tabBarLabel: 'Calificaciones',
           tabBarIcon: ({color, size})=> (
             <FontAwesome name="star" size={24} color={color} />
+          )
+        }}
+      />
+      <Tab.Screen
+        name="Citas"
+        component={Citas}
+        options={{
+          tabBarLabel: 'Citas',
+          tabBarIcon: ({color, size})=> (
+            <FontAwesome name="calendar" size={24} color={color} />
           )
         }}
       />

@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: "#7E84F2",
+    borderLeftColor: "#f9f9fbff",
     elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
