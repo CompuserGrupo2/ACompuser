@@ -1,23 +1,20 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import BotonEliminarUsuario from "./BotonEliminarUsuario.js";
-import BotonEditarUsuario from "./BotonEditarUsuario.js";
 
-const TablaUsuarios = ({ usuarios, eliminarUsuario, cargarDatos }) => {
+const TablaUsuarios = ({ usuarios, eliminarUsuario, editarUsuario, cargarDatos }) => {
   const renderItem = ({ item }) => (
     <View style={styles.fila}>
       <Text style={styles.celda}>{item.usuario}</Text>
       <Text style={styles.celda}>{item.correo}</Text>
       <Text style={styles.celda}>{item.rol}</Text>
       <View style={styles.celdaAcciones}>
-        <BotonEditarUsuario 
-          id={item.id} 
-          contraseñaInicial={item.contraseña} 
-          correoInicial={item.correo} 
-          rolInicial={item.rol} 
-          usuarioInicial={item.usuario} 
-          cargarDatos={cargarDatos} 
-        />
+        <TouchableOpacity
+          style={styles.botonActualizar}
+          onPress={() => editarUsuario(item)}
+        >
+          <Text>✏️</Text>
+        </TouchableOpacity>
         <BotonEliminarUsuario id={item.id} eliminarUsuario={eliminarUsuario} />
       </View>
     </View>
@@ -45,12 +42,12 @@ const TablaUsuarios = ({ usuarios, eliminarUsuario, cargarDatos }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 1,
-    alignSelf: "stretch"
+    alignSelf: "stretch",
   },
-  titulo: { 
-    fontSize: 22, 
-    fontWeight: "bold", 
-    marginBottom: 10 
+  titulo: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
   },
   fila: {
     flexDirection: "row",
@@ -64,7 +61,7 @@ const styles = StyleSheet.create({
   },
   celda: {
     flex: 1,
-    fontSize: 11,
+    fontSize: 14,
     textAlign: "center",
   },
   celdaAcciones: {
@@ -76,11 +73,19 @@ const styles = StyleSheet.create({
   },
   textoEncabezado: {
     fontWeight: "bold",
-    fontSize: 12,
+    fontSize: 16,
     textAlign: "center",
   },
   list: {
     flex: 1,
+  },
+  botonActualizar: {
+    padding: 4,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+    backgroundColor: "#99c99aff",
   },
 });
 

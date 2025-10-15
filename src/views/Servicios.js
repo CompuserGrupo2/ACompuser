@@ -1,17 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Button, FlatList } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { db } from "../Database/firebaseconfig";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
 import FormularioServicios from "../Componentes/Servicios/FormularioServicios";
 import TablaServicios from "../Componentes/Servicios/TablaServicios";
 
-const Servicios = ({ setPantalla }) => {
+const Servicios = () => {
   const [servicios, setServicios] = useState([]);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [servicioId, setServicioId] = useState(null);
+  const [nuevoServicio, setNuevoServicio] = useState({
+    descripcion: "",
+    costo: "",
+  });
 
   const cargarDatos = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "Servicios"));
-      const data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const data = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        descripcion: doc.data().descripcion || "",
+        costo: doc.data().costo || 0,
+      }));
       setServicios(data);
     } catch (error) {
       console.error("Error al obtener servicios: ", error);
@@ -27,31 +37,77 @@ const Servicios = ({ setPantalla }) => {
     }
   };
 
+  const manejoCambio = (nombre, valor) => {
+    setNuevoServicio((prev) => ({
+      ...prev,
+      [nombre]: valor,
+    }));
+  };
+
+  const guardarServicio = async () => {
+    try {
+      if (nuevoServicio.descripcion.trim() && nuevoServicio.costo.trim()) {
+        await addDoc(collection(db, "Servicios"), {
+          descripcion: nuevoServicio.descripcion.trim(),
+          costo: parseFloat(nuevoServicio.costo),
+        });
+        setNuevoServicio({ descripcion: "", costo: "" });
+        cargarDatos();
+      } else {
+        alert("Por favor, complete todos los campos.");
+      }
+    } catch (error) {
+      console.error("Error al guardar el servicio: ", error);
+    }
+  };
+
+  const actualizarServicio = async () => {
+    try {
+      if (nuevoServicio.descripcion.trim() && nuevoServicio.costo.trim()) {
+        await updateDoc(doc(db, "Servicios", servicioId), {
+          descripcion: nuevoServicio.descripcion.trim(),
+          costo: parseFloat(nuevoServicio.costo),
+        });
+        setNuevoServicio({ descripcion: "", costo: "" });
+        setModoEdicion(false);
+        setServicioId(null);
+        cargarDatos();
+      } else {
+        alert("Por favor, complete todos los campos.");
+      }
+    } catch (error) {
+      console.error("Error al actualizar servicio: ", error);
+    }
+  };
+
+  const editarServicio = (servicio) => {
+    setNuevoServicio({
+      descripcion: servicio.descripcion,
+      costo: servicio.costo.toString(),
+    });
+    setServicioId(servicio.id);
+    setModoEdicion(true);
+  };
+
   useEffect(() => {
     cargarDatos();
   }, []);
 
-  // Render principal para el FlatList
-  const renderItem = () => (
-    <View>
-      <FormularioServicios cargarDatos={cargarDatos} />
+  return (
+    <View style={styles.container}>
+      <FormularioServicios
+        nuevoServicio={nuevoServicio}
+        manejoCambio={manejoCambio}
+        guardarServicio={guardarServicio}
+        actualizarServicio={actualizarServicio}
+        modoEdicion={modoEdicion}
+      />
       <TablaServicios
         servicios={servicios}
         eliminarServicio={eliminarServicio}
-        cargarDatos={cargarDatos}
+        editarServicio={editarServicio}
       />
     </View>
-  );
-
-  return (
-    <FlatList
-      data={[{ id: "single-item" }]} // Un solo item para scroll completo
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      ListFooterComponent={<View style={{ height: 20 }} />} // Espacio al final
-    />
   );
 };
 
@@ -59,13 +115,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-  },
-  contentContainer: {
-    flexGrow: 1,
-  },
-  buttonContainer: {
-    marginTop: 20,
-    marginBottom: 20,
   },
 });
 

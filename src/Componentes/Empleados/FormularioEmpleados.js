@@ -1,48 +1,54 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, TextInput, Button, StyleSheet, Text, Alert } from "react-native";
-import { db } from "../../Database/firebaseconfig";
-import { collection, addDoc } from "firebase/firestore";
 
-const FormularioEmpleados = ({ cargarDatos }) => {
-  const [nombre, setNombre] = useState("");
-  const [apellido, setApellido] = useState("");
-  const [cedula, setCedula] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [direccion, setDireccion] = useState("");
-
-  const guardarEmpleado = async () => {
-    if (nombre.trim() && apellido.trim() && cedula.trim() && telefono.trim() && direccion.trim()) {
-      try {
-        await addDoc(collection(db, "Empleados"), {
-          nombre: nombre.trim(),
-          apellido: apellido.trim(),
-          cedula: cedula.trim(),
-          telefono: telefono.trim(),
-          direccion: direccion.trim(),
-        });
-        setNombre("");
-        setApellido("");
-        setCedula("");
-        setTelefono("");
-        setDireccion("");
-        cargarDatos();
-      } catch (error) {
-        console.error("Error al guardar el empleado: ", error);
-      }
-    } else {
-      Alert.alert("Por favor, complete todos los campos.");
-    }
-  };
-
+const FormularioEmpleados = ({
+  nuevoEmpleado,
+  manejoCambio,
+  guardarEmpleado,
+  actualizarEmpleado,
+  modoEdicion,
+  cargarDatos,
+}) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Registro de Empleados</Text>
-      <TextInput style={styles.input} placeholder="Nombre" value={nombre} onChangeText={setNombre} />
-      <TextInput style={styles.input} placeholder="Apellido" value={apellido} onChangeText={setApellido} />
-      <TextInput style={styles.input} placeholder="Cédula" value={cedula} onChangeText={setCedula} />
-      <TextInput style={styles.input} placeholder="Teléfono" value={telefono} onChangeText={setTelefono} keyboardType="phone-pad" />
-      <TextInput style={styles.input} placeholder="Dirección" value={direccion} onChangeText={setDireccion} />
-      <Button title="Guardar" onPress={guardarEmpleado} />
+      <Text style={styles.titulo}>
+        {modoEdicion ? "Actualizar Empleado" : "Registro de Empleados"}
+      </Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nombre"
+        value={nuevoEmpleado.nombre}
+        onChangeText={(valor) => manejoCambio("nombre", valor)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Apellido"
+        value={nuevoEmpleado.apellido}
+        onChangeText={(valor) => manejoCambio("apellido", valor)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Cédula"
+        value={nuevoEmpleado.cedula}
+        onChangeText={(valor) => manejoCambio("cedula", valor)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Teléfono"
+        value={nuevoEmpleado.telefono}
+        onChangeText={(valor) => manejoCambio("telefono", valor)}
+        keyboardType="phone-pad"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Dirección"
+        value={nuevoEmpleado.direccion}
+        onChangeText={(valor) => manejoCambio("direccion", valor)}
+      />
+      <Button
+        title={modoEdicion ? "Actualizar" : "Guardar"}
+        onPress={modoEdicion ? actualizarEmpleado : guardarEmpleado}
+      />
     </View>
   );
 };

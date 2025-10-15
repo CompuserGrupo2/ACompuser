@@ -1,56 +1,53 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, TextInput, Button, StyleSheet, Text, Alert } from "react-native";
-import { db } from "../../Database/firebaseconfig";
-import { collection, addDoc } from "firebase/firestore";
 
-const FormularioServicios = ({ cargarDatos }) => {
-  const [descripcion, setDescripcion] = useState("");
-  const [costo, setCosto] = useState("");
-
-  const guardarServicio = async () => {
-    if (descripcion.trim() && costo.trim()) {
-      try {
-        await addDoc(collection(db, "Servicios"), {
-          descripcion: descripcion.trim(),
-          costo: parseFloat(costo),
-        });
-        setDescripcion("");
-        setCosto("");
-        cargarDatos();
-      } catch (error) {
-        console.error("Error al guardar el servicio: ", error);
-      }
-    } else {
-      Alert.alert("Por favor, complete todos los campos.");
-    }
-  };
-
+const FormularioServicios = ({
+  nuevoServicio,
+  manejoCambio,
+  guardarServicio,
+  actualizarServicio,
+  modoEdicion,
+}) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Registro de Servicios</Text>
-      <TextInput style={styles.input} placeholder="Descripción del servicio" value={descripcion} onChangeText={setDescripcion} />
-      <TextInput style={styles.input} placeholder="Costo" value={costo} onChangeText={setCosto} keyboardType="numeric" />
-      <Button title="Guardar" onPress={guardarServicio} />
+      <Text style={styles.titulo}>
+        {modoEdicion ? "Actualizar Servicio" : "Registro de Servicios"}
+      </Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Descripción del servicio"
+        value={nuevoServicio.descripcion}
+        onChangeText={(valor) => manejoCambio("descripcion", valor)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Costo"
+        value={nuevoServicio.costo}
+        onChangeText={(valor) => manejoCambio("costo", valor)}
+        keyboardType="numeric"
+      />
+      <Button
+        title={modoEdicion ? "Actualizar" : "Guardar"}
+        onPress={modoEdicion ? actualizarServicio : guardarServicio}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    padding: 20 
+  container: {
+    padding: 20,
   },
-  
-  titulo: { 
-    fontSize: 22, 
-    fontWeight: "bold", 
-    marginBottom: 10 
+  titulo: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
   },
-
-  input: { 
-    borderWidth: 1, 
-    borderColor: "#ccc", 
-    padding: 10, 
-    marginBottom: 10 
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    marginBottom: 10,
   },
 });
 

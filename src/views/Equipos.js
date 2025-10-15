@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 import { db } from "../Database/firebaseconfig";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
-import ListaEquipos from '../Componentes/Equipos/ListaEquipos';
-import TablaEquipos from '../Componentes/Equipos/TablaEquipos';
-import FormularioEquipos from '../Componentes/Equipos/FormularioEquipos';
+import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
+import ListaEquipos from "../Componentes/Equipos/ListaEquipos";
+import TablaEquipos from "../Componentes/Equipos/TablaEquipos";
+import FormularioEquipos from "../Componentes/Equipos/FormularioEquipos";
 
 const Equipos = () => {
   const [equipos, setEquipos] = useState([]);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [equipoId, setEquipoId] = useState(null);
+  const [nuevoEquipo, setNuevoEquipo] = useState({
+    color: "",
+    marca: "",
+    modelo: "",
+    tipo: "",
+    cliente: null,
+  });
 
   const cargarDatos = async () => {
     try {
@@ -15,10 +24,8 @@ const Equipos = () => {
       const data = [];
 
       for (const docEquipo of querySnapshot.docs) {
-        // Traer clientes de la subcolección
         const clientesSnapshot = await getDocs(collection(db, "EquipoComputarizado", docEquipo.id, "Clientes"));
-        const clientes = clientesSnapshot.docs.map(doc => doc.data());
-
+        const clientes = clientesSnapshot.docs.map((doc) => doc.data());
         data.push({ id: docEquipo.id, ...docEquipo.data(), clientes });
       }
 
@@ -37,17 +44,120 @@ const Equipos = () => {
     }
   };
 
+  const manejoCambio = (nombre, valor) => {
+    setNuevoEquipo((prev) => ({
+      ...prev,
+      [nombre]: valor,
+    }));
+  };
+
+  const guardarEquipo = async () => {
+    try {
+      if (
+        nuevoEquipo.color.trim() &&
+        nuevoEquipo.marca.trim() &&
+        nuevoEquipo.modelo.trim() &&
+        nuevoEquipo.tipo.trim() &&
+        nuevoEquipo.cliente
+      ) {
+        await addDoc(collection(db, "EquipoComputarizado"), {
+          color: nuevoEquipo.color.trim(),
+          marca: nuevoEquipo.marca.trim(),
+          modelo: nuevoEquipo.modelo.trim(),
+          tipo: nuevoEquipo.tipo.trim(),
+          cliente: {
+            nombre: nuevoEquipo.cliente.nombre,
+            apellido: nuevoEquipo.cliente.apellido,
+            telefono: nuevoEquipo.cliente.telefono,
+          },
+        });
+        setNuevoEquipo({
+          color: "",
+          marca: "",
+          modelo: "",
+          tipo: "",
+          cliente: null,
+        });
+        setModoEdicion(false);
+        setEquipoId(null);
+        cargarDatos();
+      } else {
+        alert("Por favor, complete todos los campos y seleccione un cliente.");
+      }
+    } catch (error) {
+      console.error("Error al guardar el equipo: ", error);
+    }
+  };
+
+  const actualizarEquipo = async () => {
+    try {
+      if (
+        nuevoEquipo.color.trim() &&
+        nuevoEquipo.marca.trim() &&
+        nuevoEquipo.modelo.trim() &&
+        nuevoEquipo.tipo.trim() &&
+        nuevoEquipo.cliente
+      ) {
+        await updateDoc(doc(db, "EquipoComputarizado", equipoId), {
+          color: nuevoEquipo.color.trim(),
+          marca: nuevoEquipo.marca.trim(),
+          modelo: nuevoEquipo.modelo.trim(),
+          tipo: nuevoEquipo.tipo.trim(),
+          cliente: {
+            nombre: nuevoEquipo.cliente.nombre,
+            apellido: nuevoEquipo.cliente.apellido,
+            telefono: nuevoEquipo.cliente.telefono,
+          },
+        });
+        setNuevoEquipo({
+          color: "",
+          marca: "",
+          modelo: "",
+          tipo: "",
+          cliente: null,
+        });
+        setModoEdicion(false);
+        setEquipoId(null);
+        cargarDatos();
+      } else {
+        alert("Por favor, complete todos los campos y seleccione un cliente.");
+      }
+    } catch (error) {
+      console.error("Error al actualizar equipo: ", error);
+    }
+  };
+
+  const editarEquipo = (equipo) => {
+    setNuevoEquipo({
+      color: equipo.color,
+      marca: equipo.marca,
+      modelo: equipo.modelo,
+      tipo: equipo.tipo,
+      cliente: equipo.cliente || null,
+    });
+    setEquipoId(equipo.id);
+    setModoEdicion(true);
+  };
+
   useEffect(() => {
     cargarDatos();
   }, []);
 
   const renderItem = () => (
     <View>
-      <FormularioEquipos cargarDatos={cargarDatos} />
+      <FormularioEquipos
+        nuevoEquipo={nuevoEquipo}
+        manejoCambio={manejoCambio}
+        guardarEquipo={guardarEquipo}
+        actualizarEquipo={actualizarEquipo}
+        modoEdicion={modoEdicion}
+        cargarDatos={cargarDatos}
+      />
       <ListaEquipos />
       <TablaEquipos
         equipos={equipos}
         eliminarEquipo={eliminarEquipo}
+        editarEquipo={editarEquipo}
         cargarDatos={cargarDatos}
       />
     </View>
@@ -55,7 +165,7 @@ const Equipos = () => {
 
   return (
     <FlatList
-      data={[{ id: "single-item" }]} // Solo un elemento para usar el scroll completo
+      data={[{ id: "single-item" }]}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
       style={styles.container}
