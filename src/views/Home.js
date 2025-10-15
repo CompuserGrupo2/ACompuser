@@ -1,11 +1,13 @@
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const Home = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Logo */}
-    <Image source={require('../../Imagenes/LogoAC.jpg')} style={styles.logo} />
+    <Image source={require('../../Imagenes/LogoAC2.jpg')} style={styles.logo} />
 
       {/* Misión */}
       <View style={styles.section}>
@@ -35,16 +37,18 @@ const Home = () => {
       </View>
 
       {/* Contacto */}
-      <View style={styles.section}>
+      <View style={styles.info}>
         <Text style={styles.subtitle}>Contáctenos</Text>
         <View style={styles.contactRow}>
           <View style={styles.contactColumn}>
-            <Text style={styles.contactLabel}>Teléfono</Text>
+            <AntDesign name="phone" size={30} color="black" />
             <Text style={styles.contactValue}>+505 5799 4806</Text>
+            
           </View>
           <View style={styles.contactColumn}>
-            <Text style={styles.contactLabel}>Correo electrónico</Text>
+            <MaterialCommunityIcons name="gmail" size={30} color="black" />
             <Text style={styles.contactValue}>compusergrupo@gmail.com</Text>
+            
           </View>
         </View>
       </View>
@@ -63,8 +67,8 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: 300,
-    height: 180,
+    width: 250,
+    height: 150,
     resizeMode: 'contain',
     marginBottom: 2,
     marginTop: 4,
@@ -79,9 +83,25 @@ const styles = StyleSheet.create({
 
   section: {
     marginBottom: 25,
+    width: '100%',
+    borderRadius: 10,
+    padding: 10,
     alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+    backgroundColor: '#fff'
   },
-
+  info: {
+    marginBottom: 25,
+    alignItems: 'center',
+    marginTop: 35,
+  },
   subtitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -94,7 +114,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     color: '#555',
-    textAlign: 'center',
+    textAlign: 'justify',
   },
 
   contactRow: {
@@ -108,16 +128,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-
-  contactLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
-  },
-  
   contactValue: {
     fontSize: 15,
-    color: '#3a86ff',
+    color: '#3a85ffe1',
     textAlign: 'center',
   },
 });
