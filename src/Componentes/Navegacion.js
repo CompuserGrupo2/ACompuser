@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 
+import Usuarios from "../views/Usuarios";
 import Clientes from "../views/Clientes";
 import Empleados from "../views/Empleados";
 import Equipos from "../views/Equipos";
@@ -44,7 +45,7 @@ function MyTabs(){
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={{
-        tabBarActiveTintColor: 'purple',
+        tabBarActiveTintColor: 'blue',
       }}
     >
       <Tab.Screen
@@ -112,6 +113,17 @@ function MyTabs(){
         component={Empleados}
         options={{
           tabBarLabel: 'Empleados',
+          tabBarIcon: ({color, size})=> (
+            <FontAwesome name="users" size={24} color={color} />
+          )
+        }}
+      />
+
+      <Tab.Screen
+        name="Usuarios"
+        component={Usuarios}
+        options={{
+          tabBarLabel: 'Usuarios',
           tabBarIcon: ({color, size})=> (
             <FontAwesome name="users" size={24} color={color} />
           )
