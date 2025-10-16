@@ -12,6 +12,7 @@ const Servicios = () => {
   const [nuevoServicio, setNuevoServicio] = useState({
     descripcion: "",
     costo: "",
+    foto: "",
   });
 
   const cargarDatos = async () => {
@@ -21,6 +22,7 @@ const Servicios = () => {
         id: doc.id,
         descripcion: doc.data().descripcion || "",
         costo: doc.data().costo || 0,
+        foto: doc.data().foto || '',
       }));
       setServicios(data);
     } catch (error) {
@@ -46,12 +48,13 @@ const Servicios = () => {
 
   const guardarServicio = async () => {
     try {
-      if (nuevoServicio.descripcion.trim() && nuevoServicio.costo.trim()) {
+      if (nuevoServicio.descripcion.trim() && nuevoServicio.costo.trim && nuevoServicio.foto.trim()) {
         await addDoc(collection(db, "Servicios"), {
           descripcion: nuevoServicio.descripcion.trim(),
           costo: parseFloat(nuevoServicio.costo),
+          foto: nuevoServicio.foto.trim(),
         });
-        setNuevoServicio({ descripcion: "", costo: "" });
+        setNuevoServicio({ descripcion: "", costo: "", foto: "", });
         cargarDatos();
       } else {
         alert("Por favor, complete todos los campos.");
@@ -63,12 +66,13 @@ const Servicios = () => {
 
   const actualizarServicio = async () => {
     try {
-      if (nuevoServicio.descripcion.trim() && nuevoServicio.costo.trim()) {
+      if (nuevoServicio.descripcion.trim() && nuevoServicio.costo.trim && nuevoServicio.foto.trim()) {
         await updateDoc(doc(db, "Servicios", servicioId), {
           descripcion: nuevoServicio.descripcion.trim(),
           costo: parseFloat(nuevoServicio.costo),
+          foto: nuevoServicio.foto.trim(),
         });
-        setNuevoServicio({ descripcion: "", costo: "" });
+        setNuevoServicio({ descripcion: "", costo: "", foto: ""});
         setModoEdicion(false);
         setServicioId(null);
         cargarDatos();
@@ -84,6 +88,7 @@ const Servicios = () => {
     setNuevoServicio({
       descripcion: servicio.descripcion,
       costo: servicio.costo.toString(),
+      foto: servicio.foto,
     });
     setServicioId(servicio.id);
     setModoEdicion(true);

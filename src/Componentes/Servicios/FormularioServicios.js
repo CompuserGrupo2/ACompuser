@@ -1,5 +1,7 @@
-import React from "react";
-import { View, TextInput, Button, StyleSheet, Text, Alert } from "react-native";
+import React, { act } from "react";
+import { View, TextInput, Button, TouchableOpacity, StyleSheet, Text, Alert, Image, } from "react-native";
+import ModalFotos from "./ModalFotos";
+
 
 const FormularioServicios = ({
   nuevoServicio,
@@ -26,10 +28,26 @@ const FormularioServicios = ({
         onChangeText={(valor) => manejoCambio("costo", valor)}
         keyboardType="numeric"
       />
-      <Button
-        title={modoEdicion ? "Actualizar" : "Guardar"}
-        onPress={modoEdicion ? actualizarServicio : guardarServicio}
+      <Text style={styles.label}>Foto (URL o nombre del archivo)</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Ej. https://miimagen.com/foto.png"
+        value={nuevoServicio.foto}
+        onChangeText={(valor) => manejoCambio("foto", valor)}
       />
+        {nuevoServicio.foto ? (
+        <Image
+          source={{ uri: nuevoServicio.foto }}
+          style={styles.preview}
+          resizeMode="contain"
+
+        />
+      ) : (
+        <Text style={styles.mensajePreview}>La imagen se mostrará aquí</Text>
+      )}
+      <TouchableOpacity style={styles.boton} onPress={modoEdicion ? actualizarServicio : guardarServicio}>
+        <Text style={styles.textoBoton}>{modoEdicion ? "Actualizar" : "Guardar"}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -49,6 +67,37 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
+    boton: {
+    backgroundColor: '#7C7CFF',
+    paddingVertical: 15,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 5,
+    marginTop: 10,
+  },
+  textoBoton: {
+    color: '#f7f7ff',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+   preview: {
+    width: '80%',
+    height: 100,
+    borderRadius: 10,
+    marginBottom: 15,
+    backgroundColor: '#e8e8ff',
+  },
+  mensajePreview: {
+    textAlign: 'center',
+    color: '#999',
+    marginBottom: 15,
+    fontStyle: 'italic',
+  },
 });
+
 
 export default FormularioServicios;
