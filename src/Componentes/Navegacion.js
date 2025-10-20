@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../Database/firebaseconfig"; 
-import Login from "../views/Login";
 
+import Login from "../views/Login";
 import Usuarios from "../views/Usuarios";
 import Clientes from "../views/Clientes";
 import Empleados from "../views/Empleados";
@@ -22,6 +25,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const Tab = createBottomTabNavigator();
 const DetailsServiciosNavigator = createStackNavigator();
+const StackNav = createNativeStackNavigator();
 
 function StackDetailServicios() {
   return (
@@ -46,6 +50,174 @@ function StackDetailServicios() {
   );
 }
 
+function MyTabsCliente() {
+  return (
+    <Tab.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        tabBarActiveTintColor: "blue",
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          title: "Inicio",
+          tabBarLabel: "Inicio",
+          tabBarIcon: ({ color }) => (
+            <AntDesign name="home" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Catalogo"
+        component={ListaServicios}
+        options={{
+          tabBarLabel: "Catálogo",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="image" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="calificaciones"
+        component={FormularioCalificacion}
+        options={{
+          tabBarLabel: "Calificaciones",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="star" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Citas"
+        component={Citas}
+        options={{
+          tabBarLabel: "Citas",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="calendar" size={24} color={color} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  )
+}
+
+function MyTabsAdmin() {
+  <Tab.Navigator
+    initialRouteName="Home"
+    screenOptions={{
+      tabBarActiveTintColor: "blue",
+    }}
+  >
+    <Tab.Screen
+      name="Home"
+      component={Home}
+      options={{
+        title: "Inicio",
+        tabBarLabel: "Inicio",
+        tabBarIcon: ({ color }) => (
+          <AntDesign name="home" size={24} color={color} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="Servicios"
+      component={StackDetailServicios}
+      options={{
+        tabBarLabel: "Servicios",
+        tabBarIcon: ({ color }) => (
+          <FontAwesome name="wrench" size={24} color={color} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="Catalogo"
+      component={ListaServicios}
+      options={{
+        tabBarLabel: "Catálogo",
+        tabBarIcon: ({ color }) => (
+          <FontAwesome name="image" size={24} color={color} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="calificaciones"
+      component={FormularioCalificacion}
+      options={{
+        tabBarLabel: "Calificaciones",
+        tabBarIcon: ({ color }) => (
+          <FontAwesome name="star" size={24} color={color} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="Citas"
+      component={Citas}
+      options={{
+        tabBarLabel: "Citas",
+        tabBarIcon: ({ color }) => (
+          <FontAwesome name="calendar" size={24} color={color} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="Clientes"
+      component={Clientes}
+      options={{
+        tabBarLabel: "Clientes",
+        tabBarIcon: ({ color }) => (
+          <FontAwesome name="users" size={24} color={color} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="Equipos"
+      component={Equipos}
+      options={{
+        tabBarLabel: "Equipos",
+        tabBarIcon: ({ color }) => (
+          <FontAwesome name="laptop" size={24} color={color} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="Empleados"
+      component={Empleados}
+      options={{
+        tabBarLabel: "Empleados",
+        tabBarIcon: ({ color }) => (
+          <FontAwesome name="users" size={24} color={color} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="Usuarios"
+      component={Usuarios}
+      options={{
+        tabBarLabel: "Usuarios",
+        tabBarIcon: ({ color }) => (
+          <FontAwesome name="user" size={24} color={color} />
+        ),
+      }}
+    />
+  </Tab.Navigator>
+}
+
+
+function StackLogin() {
+  return (
+    <StackNav.Navigator initialRouteName="Login" 
+      screenOptions={{ headerShown: false }}>
+      <StackNav.Screen name="Login" component={Login} />
+      <StackNav.Screen name="MyTabsCliente" component={MyTabsCliente} />
+      <StackNav.Screen name="MyTabsAdmin" component={MyTabsAdmin} />
+    </StackNav.Navigator>
+  )
+}
+
+
+
 function MyTabs() {
   return (
     <Tab.Navigator
@@ -58,7 +230,7 @@ function MyTabs() {
         name="Home"
         component={Home}
         options={{
-          title: "Acerca de la Empresa",
+          title: "Inicio",
           tabBarLabel: "Inicio",
           tabBarIcon: ({ color }) => (
             <AntDesign name="home" size={24} color={color} />
@@ -76,7 +248,7 @@ function MyTabs() {
         }}
       />
       <Tab.Screen
-        name="Catalogo"
+        name="Catálogo"
         component={ListaServicios}
         options={{
           tabBarLabel: "Catálogo",

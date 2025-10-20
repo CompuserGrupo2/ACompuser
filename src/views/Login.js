@@ -34,6 +34,7 @@ const Login = ({ onLoginSuccess }) => {
 
   return (
     <View style={styles.container}>
+
       <Image
         source={require('../../Imagenes/LogoAC2.jpg')}
         style={styles.logo}
@@ -64,6 +65,7 @@ const Login = ({ onLoginSuccess }) => {
       >
         <Text style={styles.textoBoton}>Entrar</Text>
       </TouchableOpacity>
+
     </View>
   );
 };
@@ -75,6 +77,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#ffffffff',
     alignItems: 'center', 
+    marginBottom: 130
   },
 
   logo: {

@@ -88,8 +88,9 @@ const styles = StyleSheet.create({
   },
 
    preview: {
-    width: '80%',
+    width: 100,
     height: 100,
+    alignSelf: 'center',
     borderRadius: 10,
     marginBottom: 15,
     backgroundColor: '#e8e8ff',

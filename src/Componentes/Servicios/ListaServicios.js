@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Image} from "react-native";
 import { db } from "../../Database/firebaseconfig";
 import { collection, getDocs } from "firebase/firestore";
 import { MaterialIcons } from "@expo/vector-icons"; // Impor el ícono
@@ -78,14 +78,25 @@ const ListaServicios = () => {
       </View>
 
       <View style={{ flex: 1 }}>
-        <Text style={styles.descripcion}>{item.descripcion}</Text>
-        <Text style={styles.costo}>C$ {item.costo}</Text>
-        <Text style={styles.calificacion}>
-          ⭐{" "}
-          {item.promedioCalificacion !== "N/A"
-            ? item.promedioCalificacion
-            : "Sin calificación"}
-        </Text>
+        <View style={{ flexDirection: "row" }}>
+        <View style={{flex: 1}}>
+          <Text style={styles.descripcion}>{item.descripcion}</Text>
+          <Text style={styles.costo}>C$ {item.costo}</Text>
+          <Text style={styles.calificacion}>
+            ⭐{" "}
+            {item.promedioCalificacion !== "N/A"
+              ? item.promedioCalificacion
+              : "Sin calificación"}
+          </Text>
+        </View>
+        <View style={{flex: 0}}>
+          <Image
+            source={{ uri: item.foto }}
+            style={styles.preview}
+            resizeMode="contain"
+          />
+        </View>
+        </View>
 
         {/* Mostrar detalles si está seleccionado */}
         {servicioSeleccionado === item.id && item.calificaciones.length > 0 && (
@@ -116,6 +127,7 @@ const ListaServicios = () => {
           </Text>
         )}
       </View>
+
     </TouchableOpacity>
   );
 
@@ -136,17 +148,23 @@ const ListaServicios = () => {
         data={servicios}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
+        contentContainerStyle={{ paddingBottom: 40 }} // 👈 espacio al final
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 15 },
+  container: { 
+    padding: 15, 
+    backgroundColor: "#F5F7FA", 
+    flex: 1,
+  },
+
   titulo: {
     fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 12,
+    marginBottom: 15,
     color: "#0D0D0D",
     textAlign: "center",
   },
@@ -155,73 +173,88 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    marginBottom: 10,
-    borderRadius: 10,
-    borderLeftWidth: 5,
-    borderLeftColor: "#7E84F2",
-    elevation: 3,
+    padding: 12,
+    marginBottom: 14,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
+    elevation: 0,
   },
-  
+
   iconContainer: {
-    backgroundColor: "#EEF0FF",
+    backgroundColor: "#E6E8FC",
     padding: 10,
-    borderRadius: 10,
+    borderRadius: 12,
     marginRight: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  preview: {
+    width: 95,
+    height: 95,
+    borderRadius: 12,
+    marginLeft: 10,
+    backgroundColor: "#F0F1FF",
+    borderWidth: 1,
+    borderColor: "#E2E5FF",
   },
 
   descripcion: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#0D0D0D",
+    color: "#2C2C2C",
     marginBottom: 3,
   },
 
   costo: {
     fontSize: 15,
     color: "#369AD9",
-    marginBottom: 5,
+    marginBottom: 4,
+    fontWeight: "500",
   },
 
   calificacion: {
     fontSize: 14,
     color: "#F9A825",
-    fontWeight: "500",
+    fontWeight: "600",
   },
 
   detalleContainer: {
-    marginTop: 8,
-    backgroundColor: "#f8f9fa",
+    marginTop: 10,
+    backgroundColor: "#F9FAFB",
     padding: 10,
-    borderRadius: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#EAEAEA",
   },
 
   subtitulo: {
     fontWeight: "bold",
-    color: "#0D0D0D",
+    color: "#222",
     marginBottom: 6,
+    fontSize: 15,
   },
 
   detalleItem: {
     marginBottom: 8,
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottomColor: "#E0E0E0",
     paddingBottom: 6,
   },
 
   detalleTexto: {
     fontSize: 14,
-    color: "#333",
+    color: "#444",
   },
 
   label: {
     fontWeight: "600",
-    color: "#0D0D0D",
+    color: "#111",
   },
 
   sinCalificaciones: {
@@ -229,8 +262,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#777",
     fontStyle: "italic",
+    textAlign: "center",
   },
-  
+
   loading: {
     flex: 1,
     justifyContent: "center",
