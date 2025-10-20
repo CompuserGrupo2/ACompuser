@@ -1,7 +1,5 @@
 import React, { act } from "react";
 import { View, TextInput, Button, TouchableOpacity, StyleSheet, Text, Alert, Image, } from "react-native";
-import ModalFotos from "./ModalFotos";
-
 
 const FormularioServicios = ({
   nuevoServicio,
@@ -56,21 +54,24 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
   },
+
   titulo: {
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 10,
   },
+
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 10,
     marginBottom: 10,
   },
+
     boton: {
-    backgroundColor: '#7C7CFF',
-    paddingVertical: 15,
-    borderRadius: 10,
+    backgroundColor: '#369AD9',
+    paddingVertical: 10,
+    borderRadius: 6,
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -78,12 +79,14 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginTop: 10,
   },
+
   textoBoton: {
     color: '#f7f7ff',
     fontWeight: 'bold',
     fontSize: 18,
     textAlign: 'center',
   },
+
    preview: {
     width: '80%',
     height: 100,
@@ -91,6 +94,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#e8e8ff',
   },
+  
   mensajePreview: {
     textAlign: 'center',
     color: '#999',
