@@ -1,24 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import { db } from "../../Database/firebaseconfig";
-import { collection, getDocs } from "firebase/firestore";
 
-const ListaEquipos = () => {
-  const [equipos, setEquipos] = useState([]);
-
-  const cargarDatos = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "EquipoComputarizado"));
-      const datos = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setEquipos(datos);
-    } catch (error) {
-      console.error("Error al cargar equipos:", error);
-    }
-  };
-
-  useEffect(() => {
-    cargarDatos();
-  }, []);
+const ListaEquipos = ({ equipos }) => {
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -45,42 +28,37 @@ const ListaEquipos = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
+  container: {
+    flex: 1,
     padding: 15
   },
-  
-  header: { 
-    fontSize: 22, 
-    fontWeight: "bold", 
-    marginBottom: 15, 
-    textAlign: "left" 
+  header: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 15,
+    textAlign: "left"
   },
-  
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
-    marginBottom: 12,
+    marginBottom: 12
   },
-  
-  titulo: { 
-    fontSize: 18, 
-    fontWeight: "bold", 
-    marginBottom: 6 
+  titulo: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 6
   },
-
-  detalle: { 
-    fontSize: 14, 
-    marginBottom: 3, 
-    color: "#333" 
+  detalle: {
+    fontSize: 14,
+    marginBottom: 3,
+    color: "#333"
   },
-
-  cliente: 
-  { fontSize: 14, 
-    fontWeight: "bold", 
-    color: "#7E84F2", 
-    marginTop: 5 
+  cliente: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#7E84F2",
+    marginTop: 5
   }
 });
 

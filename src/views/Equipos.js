@@ -21,14 +21,10 @@ const Equipos = () => {
   const cargarDatos = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "EquipoComputarizado"));
-      const data = [];
-
-      for (const docEquipo of querySnapshot.docs) {
-        const clientesSnapshot = await getDocs(collection(db, "EquipoComputarizado", docEquipo.id, "Clientes"));
-        const clientes = clientesSnapshot.docs.map((doc) => doc.data());
-        data.push({ id: docEquipo.id, ...docEquipo.data(), clientes });
-      }
-
+      const data = querySnapshot.docs.map(docEquipo => ({
+        id: docEquipo.id,
+        ...docEquipo.data()
+      }));
       setEquipos(data);
     } catch (error) {
       console.error("Error al obtener equipos: ", error);
@@ -45,10 +41,7 @@ const Equipos = () => {
   };
 
   const manejoCambio = (nombre, valor) => {
-    setNuevoEquipo((prev) => ({
-      ...prev,
-      [nombre]: valor,
-    }));
+    setNuevoEquipo(prev => ({ ...prev, [nombre]: valor }));
   };
 
   const guardarEquipo = async () => {
@@ -65,19 +58,9 @@ const Equipos = () => {
           marca: nuevoEquipo.marca.trim(),
           modelo: nuevoEquipo.modelo.trim(),
           tipo: nuevoEquipo.tipo.trim(),
-          cliente: {
-            nombre: nuevoEquipo.cliente.nombre,
-            apellido: nuevoEquipo.cliente.apellido,
-            telefono: nuevoEquipo.cliente.telefono,
-          },
+          cliente: nuevoEquipo.cliente,
         });
-        setNuevoEquipo({
-          color: "",
-          marca: "",
-          modelo: "",
-          tipo: "",
-          cliente: null,
-        });
+        setNuevoEquipo({ color: "", marca: "", modelo: "", tipo: "", cliente: null });
         setModoEdicion(false);
         setEquipoId(null);
         cargarDatos();
@@ -103,19 +86,9 @@ const Equipos = () => {
           marca: nuevoEquipo.marca.trim(),
           modelo: nuevoEquipo.modelo.trim(),
           tipo: nuevoEquipo.tipo.trim(),
-          cliente: {
-            nombre: nuevoEquipo.cliente.nombre,
-            apellido: nuevoEquipo.cliente.apellido,
-            telefono: nuevoEquipo.cliente.telefono,
-          },
+          cliente: nuevoEquipo.cliente,
         });
-        setNuevoEquipo({
-          color: "",
-          marca: "",
-          modelo: "",
-          tipo: "",
-          cliente: null,
-        });
+        setNuevoEquipo({ color: "", marca: "", modelo: "", tipo: "", cliente: null });
         setModoEdicion(false);
         setEquipoId(null);
         cargarDatos();
@@ -128,13 +101,7 @@ const Equipos = () => {
   };
 
   const editarEquipo = (equipo) => {
-    setNuevoEquipo({
-      color: equipo.color,
-      marca: equipo.marca,
-      modelo: equipo.modelo,
-      tipo: equipo.tipo,
-      cliente: equipo.cliente || null,
-    });
+    setNuevoEquipo({ ...equipo });
     setEquipoId(equipo.id);
     setModoEdicion(true);
   };
@@ -153,7 +120,7 @@ const Equipos = () => {
         modoEdicion={modoEdicion}
         cargarDatos={cargarDatos}
       />
-      <ListaEquipos />
+      <ListaEquipos equipos={equipos} />
       <TablaEquipos
         equipos={equipos}
         eliminarEquipo={eliminarEquipo}
@@ -176,8 +143,13 @@ const Equipos = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  contentContainer: { flexGrow: 1 },
+  container: {
+    flex: 1,
+    padding: 20
+  },
+  contentContainer: {
+    flexGrow: 1
+  },
 });
 
 export default Equipos;

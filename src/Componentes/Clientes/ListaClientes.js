@@ -1,24 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import { db } from "../../Database/firebaseconfig";
-import { collection, getDocs } from "firebase/firestore";
 
-const ListaClientes = () => {
-  const [clientes, setClientes] = useState([]);
-
-  const cargarDatos = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "Clientes"));
-      const datos = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setClientes(datos);
-    } catch (error) {
-      console.error("Error al cargar clientes:", error);
-    }
-  };
-
-  useEffect(() => {
-    cargarDatos();
-  }, []);
+const ListaClientes = ({ clientes }) => {
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -47,39 +30,21 @@ const styles = StyleSheet.create({
     flex: 1, 
     padding: 15 
   },
-  
   header: { 
     fontSize: 22, 
     fontWeight: "bold", 
     marginBottom: 15, 
-    textAlign: "Left" 
+    textAlign: "left" 
   },
-
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
     marginBottom: 12,
   },
-
-  titulo: 
-  { fontSize: 18, 
-    fontWeight: "bold", 
-    marginBottom: 6 
-  },
-
-  detalle: 
-  { fontSize: 14, 
-    marginBottom: 3, 
-    color: "#333" 
-  },
-
-  cliente: { 
-    fontSize: 14, 
-    fontWeight: "bold", 
-    color: "#7E84F2", 
-    marginTop: 5 
-  }
+  titulo: { fontSize: 18, fontWeight: "bold", marginBottom: 6 },
+  detalle: { fontSize: 14, marginBottom: 3, color: "#333" },
+  cliente: { fontSize: 14, fontWeight: "bold", color: "#7E84F2", marginTop: 5 }
 });
 
 export default ListaClientes;

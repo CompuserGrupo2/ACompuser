@@ -52,9 +52,7 @@ const Login = ({ onLoginSuccess }) => {
         source={require('../../Imagenes/LogoAC2.jpg')}
         style={styles.logo}
       />
-      <Text style={styles.titulo}>Inicia Sesión</Text>
-      <Text style={styles.subtitulo}>Ingresa tu correo electrónico</Text>
-      <Text style={styles.subtitulos}>para iniciar sesión</Text>
+      <Text style={styles.titulo}>Iniciar Sesión</Text>
 
       <TextInput
         style={styles.input}
@@ -86,7 +84,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     padding: 20, 
     alignItems: 'center', 
-    backgroundColor: '#fff' 
+    backgroundColor: '#fff',
+    marginBottom: 130
   },
 
   logo: { 

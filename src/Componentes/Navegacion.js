@@ -3,8 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from "rea
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStackNavigator } from "@react-navigation/stack";
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../Database/firebaseconfig";
@@ -24,37 +23,24 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const Tab = createBottomTabNavigator();
-const DetailsServiciosNavigator = createStackNavigator();
 const StackNav = createNativeStackNavigator();
 
-// Stack interno para Servicios
+// Stack interno para Servicios (Admin)
 function StackDetailServicios() {
   return (
-    <DetailsServiciosNavigator.Navigator
-      initialRouteName="ListaServiciosStack"
-      screenOptions={{ headerShown: false }} 
-    >
-      <DetailsServiciosNavigator.Screen
-        name="ListaServiciosStack"
-        component={Servicios}
-      />
-      <DetailsServiciosNavigator.Screen
-        name="Catalogo"
-        component={ListaServicios}
-      />
-      <DetailsServiciosNavigator.Screen name="Citas" component={Citas} />
-      <DetailsServiciosNavigator.Screen
-        name="calificaciones"
-        component={FormularioCalificacion}
-      />
-    </DetailsServiciosNavigator.Navigator>
+    <StackNav.Navigator initialRouteName="ListaServiciosStack" screenOptions={{ headerShown: false }}>
+      <StackNav.Screen name="ListaServiciosStack" component={Servicios} />
+      <StackNav.Screen name="Catalogo" component={ListaServicios} />
+      <StackNav.Screen name="Citas" component={Citas} />
+      <StackNav.Screen name="calificaciones" component={FormularioCalificacion} />
+    </StackNav.Navigator>
   );
 }
 
-// Cerrar Sesión
+// Componente de Cerrar Sesión
 function CerrarSesionScreen({ cerrarSesion }) {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <TouchableOpacity onPress={cerrarSesion} style={styles.logoutButton}>
         <Text style={styles.logoutText}>Cerrar Sesión</Text>
       </TouchableOpacity>
@@ -70,9 +56,8 @@ function MyTabsCliente({ cerrarSesion }) {
         name="Home"
         component={Home}
         options={{
-          title: "Inicio",
           tabBarLabel: "Inicio",
-          tabBarIcon: ({ color }) => <AntDesign name="home" size={24} color={color} />
+          tabBarIcon: ({ color }) => <AntDesign name="home" size={24} color={color} />,
         }}
       />
       <Tab.Screen
@@ -80,7 +65,7 @@ function MyTabsCliente({ cerrarSesion }) {
         component={ListaServicios}
         options={{
           tabBarLabel: "Catálogo",
-          tabBarIcon: ({ color }) => <FontAwesome name="image" size={24} color={color} />
+          tabBarIcon: ({ color }) => <FontAwesome name="image" size={24} color={color} />,
         }}
       />
       <Tab.Screen
@@ -88,7 +73,7 @@ function MyTabsCliente({ cerrarSesion }) {
         component={FormularioCalificacion}
         options={{
           tabBarLabel: "Calificaciones",
-          tabBarIcon: ({ color }) => <FontAwesome name="star" size={24} color={color} />
+          tabBarIcon: ({ color }) => <FontAwesome name="star" size={24} color={color} />,
         }}
       />
       <Tab.Screen
@@ -96,14 +81,14 @@ function MyTabsCliente({ cerrarSesion }) {
         component={Citas}
         options={{
           tabBarLabel: "Citas",
-          tabBarIcon: ({ color }) => <FontAwesome name="calendar" size={24} color={color} />
+          tabBarIcon: ({ color }) => <FontAwesome name="calendar" size={24} color={color} />,
         }}
       />
       <Tab.Screen
         name="CerrarSesion"
         options={{
           tabBarLabel: "Cerrar Sesión",
-          tabBarIcon: ({ color }) => <FontAwesome name="sign-out" size={24} color={color} />
+          tabBarIcon: ({ color }) => <FontAwesome name="sign-out" size={24} color={color} />,
         }}
       >
         {() => <CerrarSesionScreen cerrarSesion={cerrarSesion} />}
@@ -120,9 +105,8 @@ function MyTabsAdmin({ cerrarSesion }) {
         name="Home"
         component={Home}
         options={{
-          title: "Inicio",
           tabBarLabel: "Inicio",
-          tabBarIcon: ({ color }) => <AntDesign name="home" size={24} color={color} />
+          tabBarIcon: ({ color }) => <AntDesign name="home" size={24} color={color} />,
         }}
       />
       <Tab.Screen
@@ -130,7 +114,15 @@ function MyTabsAdmin({ cerrarSesion }) {
         component={StackDetailServicios}
         options={{
           tabBarLabel: "Servicios",
-          tabBarIcon: ({ color }) => <FontAwesome name="wrench" size={24} color={color} />
+          tabBarIcon: ({ color }) => <FontAwesome name="wrench" size={24} color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="Catalogo"
+        component={ListaServicios}
+        options={{
+          tabBarLabel: "Catálogo",
+          tabBarIcon: ({ color }) => <FontAwesome name="image" size={24} color={color} />,
         }}
       />
       <Tab.Screen
@@ -138,7 +130,7 @@ function MyTabsAdmin({ cerrarSesion }) {
         component={Citas}
         options={{
           tabBarLabel: "Citas",
-          tabBarIcon: ({ color }) => <FontAwesome name="calendar" size={24} color={color} />
+          tabBarIcon: ({ color }) => <FontAwesome name="calendar" size={24} color={color} />,
         }}
       />
       <Tab.Screen
@@ -146,7 +138,7 @@ function MyTabsAdmin({ cerrarSesion }) {
         component={Clientes}
         options={{
           tabBarLabel: "Clientes",
-          tabBarIcon: ({ color }) => <FontAwesome name="users" size={24} color={color} />
+          tabBarIcon: ({ color }) => <FontAwesome name="users" size={24} color={color} />,
         }}
       />
       <Tab.Screen
@@ -154,7 +146,7 @@ function MyTabsAdmin({ cerrarSesion }) {
         component={Equipos}
         options={{
           tabBarLabel: "Equipos",
-          tabBarIcon: ({ color }) => <FontAwesome name="laptop" size={24} color={color} />
+          tabBarIcon: ({ color }) => <FontAwesome name="laptop" size={24} color={color} />,
         }}
       />
       <Tab.Screen
@@ -162,7 +154,7 @@ function MyTabsAdmin({ cerrarSesion }) {
         component={Empleados}
         options={{
           tabBarLabel: "Empleados",
-          tabBarIcon: ({ color }) => <FontAwesome name="users" size={24} color={color} />
+          tabBarIcon: ({ color }) => <FontAwesome name="users" size={24} color={color} />,
         }}
       />
       <Tab.Screen
@@ -170,14 +162,14 @@ function MyTabsAdmin({ cerrarSesion }) {
         component={Usuarios}
         options={{
           tabBarLabel: "Usuarios",
-          tabBarIcon: ({ color }) => <FontAwesome name="user" size={24} color={color} />
+          tabBarIcon: ({ color }) => <FontAwesome name="user" size={24} color={color} />,
         }}
       />
       <Tab.Screen
         name="CerrarSesion"
         options={{
           tabBarLabel: "Cerrar Sesión",
-          tabBarIcon: ({ color }) => <FontAwesome name="sign-out" size={24} color={color} />
+          tabBarIcon: ({ color }) => <FontAwesome name="sign-out" size={24} color={color} />,
         }}
       >
         {() => <CerrarSesionScreen cerrarSesion={cerrarSesion} />}
@@ -186,7 +178,7 @@ function MyTabsAdmin({ cerrarSesion }) {
   );
 }
 
-// Componente principal
+// Componente principal de navegación
 export default function Navegacion() {
   const [usuario, setUsuario] = useState(null);
   const [cargando, setCargando] = useState(true);
@@ -203,7 +195,7 @@ export default function Navegacion() {
   const cerrarSesion = async () => {
     try {
       await signOut(auth);
-      setUsuario(null);
+      setUsuario(null); // esto vuelve automáticamente al login
     } catch (error) {
       console.error("Error al cerrar sesión: ", error);
     }
@@ -212,41 +204,37 @@ export default function Navegacion() {
   if (cargando) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="blue"/>
+        <ActivityIndicator size="large" color="blue" />
       </View>
     );
   }
 
-  if (!usuario) {
-    return <Login onLoginSuccess={(userConRol) => setUsuario(userConRol)} />;
-  }
-
+  // Mostrar login o tabs según usuario
   return (
     <NavigationContainer>
-      {usuario.rol === "Admin" ? (
-        <MyTabsAdmin cerrarSesion={cerrarSesion} />
+      {usuario ? (
+        usuario.rol === "Cliente" ? (
+          <MyTabsCliente cerrarSesion={cerrarSesion} />
+        ) : (
+          <MyTabsAdmin cerrarSesion={cerrarSesion} />
+        )
       ) : (
-        <MyTabsCliente cerrarSesion={cerrarSesion} />
+        <Login onLoginSuccess={(userConRol) => setUsuario(userConRol)} />
       )}
     </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  header: { 
-    height: 80, 
-    backgroundColor: "#007bff" 
+  logoutButton: {
+    backgroundColor: "#dc3545",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
   },
-
-  logoutButton: { 
-    backgroundColor: "#dc3545", 
-    paddingHorizontal: 10, 
-    paddingVertical: 5, 
-    borderRadius: 6 
-  },
-
-  logoutText: { 
-    color: "white", 
-    fontWeight: "bold" 
+  logoutText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
+
