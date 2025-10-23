@@ -27,12 +27,12 @@ const TablaUsuarios = ({ usuarios, eliminarUsuario, editarUsuario }) => {
       <Text style={[styles.celda, styles.celdaRol]} numberOfLines={1}>
         {item.rol}
       </Text>
-      <View style={styles.celdaAcciones}>
+      <View style={[styles.celda, styles.celdaAcciones]}>
         <TouchableOpacity
           style={styles.botonActualizar}
           onPress={() => editarUsuario(item)}
         >
-          <Icon name="edit" size={15} color="#fff" />
+          <Icon name="edit" size={14} color="#fff" />
         </TouchableOpacity>
         <BotonEliminarUsuario id={item.id} eliminarUsuario={eliminarUsuario} />
       </View>
@@ -90,10 +90,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 8,
     marginVertical: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
     elevation: 2,
   },
   encabezado: {
@@ -116,15 +112,15 @@ const styles = StyleSheet.create({
     maxWidth: 160,
   },
   celdaRol: {
-    flex: 1,
+    flex: 1.2,
     maxWidth: 80,
   },
   celdaAcciones: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "left",
-    alignItems: "left",
-    gap: 6,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
   },
   textoEncabezado: {
     fontWeight: "bold",

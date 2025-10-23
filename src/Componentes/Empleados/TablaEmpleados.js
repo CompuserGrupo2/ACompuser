@@ -31,7 +31,7 @@ const TablaEmpleados = ({ empleados, eliminarEmpleado, editarEmpleado }) => {
           style={styles.botonActualizar}
           onPress={() => editarEmpleado(item)}
         >
-          <Icon name="edit" size={18} color="#fff" />
+          <Icon name="edit" size={14} color="#fff" />
         </TouchableOpacity>
         <BotonEliminarEmpleado id={item.id} eliminarEmpleado={eliminarEmpleado} />
       </View>
@@ -95,10 +95,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 8,
     marginVertical: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
     elevation: 2,
   },
   encabezado: {
