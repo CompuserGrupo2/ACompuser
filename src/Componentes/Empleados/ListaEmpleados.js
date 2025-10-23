@@ -27,7 +27,7 @@ const ListaEmpleados = ({ empleados }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 15 },
-  header: { fontSize: 22, fontWeight: "bold", marginBottom: 15, textAlign: "left" },
+  header: { fontSize: 22, fontWeight: "bold", marginBottom: 15, textAlign: "center" },
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,

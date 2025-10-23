@@ -138,13 +138,13 @@ const Empleados = ({ setPantalla }) => {
         modoEdicion={modoEdicion}
         cargarDatos={cargarDatos}
       />
-      <ListaEmpleados empleados={empleados} />
       <TablaEmpleados
         empleados={empleados}
         eliminarEmpleado={eliminarEmpleado}
         editarEmpleado={editarEmpleado}
         cargarDatos={cargarDatos}
       />
+      <ListaEmpleados empleados={empleados} />
     </View>
   );
 

@@ -1,19 +1,38 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
 import BotonEliminarUsuario from "./BotonEliminarUsuario.js";
 
-const TablaUsuarios = ({ usuarios, eliminarUsuario, editarUsuario, cargarDatos }) => {
-  const renderItem = ({ item }) => (
-    <View style={styles.fila}>
-      <Text style={styles.celda}>{item.usuario}</Text>
-      <Text style={styles.celda}>{item.correo}</Text>
-      <Text style={styles.celda}>{item.rol}</Text>
+const TablaUsuarios = ({ usuarios, eliminarUsuario, editarUsuario }) => {
+  const renderItem = ({ item, index }) => (
+    <View
+      style={[
+        styles.fila,
+        { backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#eaf6f6" },
+      ]}
+    >
+      <Text style={[styles.celda, styles.celdaUsuario]} numberOfLines={1}>
+        {item.usuario}
+      </Text>
+      <Text style={[styles.celda, styles.celdaCorreo]} numberOfLines={1}>
+        {item.correo}
+      </Text>
+      <Text style={[styles.celda, styles.celdaRol]} numberOfLines={1}>
+        {item.rol}
+      </Text>
       <View style={styles.celdaAcciones}>
         <TouchableOpacity
           style={styles.botonActualizar}
           onPress={() => editarUsuario(item)}
         >
-          <Text>✏️</Text>
+          <Icon name="edit" size={15} color="#fff" />
         </TouchableOpacity>
         <BotonEliminarUsuario id={item.id} eliminarUsuario={eliminarUsuario} />
       </View>
@@ -23,69 +42,104 @@ const TablaUsuarios = ({ usuarios, eliminarUsuario, editarUsuario, cargarDatos }
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>Tabla de Usuarios</Text>
-      <View style={[styles.fila, styles.encabezado]}>
-        <Text style={[styles.celda, styles.textoEncabezado]}>Usuario</Text>
-        <Text style={[styles.celda, styles.textoEncabezado]}>Correo</Text>
-        <Text style={[styles.celda, styles.textoEncabezado]}>Rol</Text>
-        <Text style={[styles.celda, styles.textoEncabezado]}>Acciones</Text>
-      </View>
-      <FlatList
-        data={usuarios}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        style={styles.list}
-      />
+      <ScrollView horizontal>
+        <View style={[styles.fila, styles.encabezado]}>
+          <Text style={[styles.celda, styles.textoEncabezado, styles.celdaUsuario]}>
+            Usuario
+          </Text>
+          <Text style={[styles.celda, styles.textoEncabezado, styles.celdaCorreo]}>
+            Correo
+          </Text>
+          <Text style={[styles.celda, styles.textoEncabezado, styles.celdaRol]}>
+            Rol
+          </Text>
+          <Text style={[styles.celda, styles.textoEncabezado, styles.celdaAcciones]}>
+            Acciones
+          </Text>
+        </View>
+      </ScrollView>
+      <ScrollView horizontal>
+        <FlatList
+          data={usuarios}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          style={styles.list}
+        />
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 1,
+    padding: 10,
     alignSelf: "stretch",
   },
   titulo: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 12,
+    textAlign: "center",
+    color: "#333",
   },
   fila: {
     flexDirection: "row",
     borderBottomWidth: 1,
-    borderColor: "#ccc",
-    paddingVertical: 6,
+    borderColor: "#e0e0e0",
+    paddingVertical: 10,
     alignItems: "center",
+    borderRadius: 8,
+    marginVertical: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   encabezado: {
     backgroundColor: "#59C1D9",
+    borderBottomWidth: 2,
+    borderColor: "#fff",
+    paddingVertical: 12,
   },
   celda: {
-    flex: 1,
-    fontSize: 14,
     textAlign: "center",
+    fontSize: 12,
+    paddingHorizontal: 4,
+  },
+  celdaUsuario: {
+    flex: 1.5,
+    maxWidth: 100,
+  },
+  celdaCorreo: {
+    flex: 2.5,
+    maxWidth: 160,
+  },
+  celdaRol: {
+    flex: 1,
+    maxWidth: 80,
   },
   celdaAcciones: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 8,
+    justifyContent: "left",
+    alignItems: "left",
+    gap: 6,
   },
   textoEncabezado: {
     fontWeight: "bold",
-    fontSize: 16,
-    textAlign: "center",
+    color: "#fff",
+    fontSize: 13,
   },
   list: {
     flex: 1,
   },
   botonActualizar: {
-    padding: 4,
+    padding: 6,
     borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
-    alignSelf: "center",
-    backgroundColor: "#99c99aff",
+    backgroundColor: "#4CAF50",
   },
 });
 

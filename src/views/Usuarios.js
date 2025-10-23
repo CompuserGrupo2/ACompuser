@@ -130,13 +130,13 @@ const Usuarios = () => {
         modoEdicion={modoEdicion}
         cargarDatos={cargarDatos}
       />
-      <ListaUsuarios usuarios={usuarios} />
       <TablaUsuarios
         usuarios={usuarios}
         eliminarUsuario={eliminarUsuario}
         editarUsuario={editarUsuario}
         cargarDatos={cargarDatos}
       />
+      <ListaUsuarios usuarios={usuarios} />
     </View>
   );
 
