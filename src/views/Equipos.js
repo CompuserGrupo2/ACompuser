@@ -3,7 +3,6 @@ import { View, StyleSheet, FlatList } from "react-native";
 import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
 import ListaEquipos from "../Componentes/Equipos/ListaEquipos";
-import TablaEquipos from "../Componentes/Equipos/TablaEquipos";
 import FormularioEquipos from "../Componentes/Equipos/FormularioEquipos";
 
 const Equipos = () => {
@@ -23,7 +22,7 @@ const Equipos = () => {
       const querySnapshot = await getDocs(collection(db, "EquipoComputarizado"));
       const data = querySnapshot.docs.map(docEquipo => ({
         id: docEquipo.id,
-        ...docEquipo.data()
+        ...docEquipo.data(),
       }));
       setEquipos(data);
     } catch (error) {
@@ -120,8 +119,8 @@ const Equipos = () => {
         modoEdicion={modoEdicion}
         cargarDatos={cargarDatos}
       />
-      <ListaEquipos equipos={equipos} />
-      <TablaEquipos
+
+      <ListaEquipos
         equipos={equipos}
         eliminarEquipo={eliminarEquipo}
         editarEquipo={editarEquipo}
@@ -145,10 +144,10 @@ const Equipos = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20
+    padding: 20,
   },
   contentContainer: {
-    flexGrow: 1
+    flexGrow: 1,
   },
 });
 

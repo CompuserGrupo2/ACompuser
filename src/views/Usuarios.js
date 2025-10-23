@@ -4,7 +4,6 @@ import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
 import ListaUsuarios from "../Componentes/Usuarios/ListaUsuarios";
 import FormularioUsuarios from "../Componentes/Usuarios/FormularioUsuarios";
-import TablaUsuarios from "../Componentes/Usuarios/TablaUsuarios";
 
 const Usuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -130,13 +129,12 @@ const Usuarios = () => {
         modoEdicion={modoEdicion}
         cargarDatos={cargarDatos}
       />
-      <TablaUsuarios
+
+      <ListaUsuarios
         usuarios={usuarios}
         eliminarUsuario={eliminarUsuario}
         editarUsuario={editarUsuario}
-        cargarDatos={cargarDatos}
       />
-      <ListaUsuarios usuarios={usuarios} />
     </View>
   );
 
@@ -159,10 +157,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-  },
-  buttonContainer: {
-    marginTop: 20,
-    marginBottom: 20,
   },
 });
 

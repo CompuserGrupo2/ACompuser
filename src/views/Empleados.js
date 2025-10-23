@@ -4,7 +4,6 @@ import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
 import ListaEmpleados from "../Componentes/Empleados/ListaEmpleados";
 import FormularioEmpleados from "../Componentes/Empleados/FormularioEmpleados";
-import TablaEmpleados from "../Componentes/Empleados/TablaEmpleados";
 
 const Empleados = ({ setPantalla }) => {
   const [empleados, setEmpleados] = useState([]);
@@ -138,13 +137,12 @@ const Empleados = ({ setPantalla }) => {
         modoEdicion={modoEdicion}
         cargarDatos={cargarDatos}
       />
-      <TablaEmpleados
+
+      <ListaEmpleados
         empleados={empleados}
         eliminarEmpleado={eliminarEmpleado}
         editarEmpleado={editarEmpleado}
-        cargarDatos={cargarDatos}
       />
-      <ListaEmpleados empleados={empleados} />
     </View>
   );
 

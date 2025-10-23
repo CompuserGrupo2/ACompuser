@@ -37,16 +37,55 @@ const BotonEliminarEmpleado = ({ id, eliminarEmpleado }) => {
 };
 
 const styles = StyleSheet.create({
-  boton: { padding: 4, borderRadius: 5, backgroundColor: "#f19090", alignItems: "center" },
-  textoBoton: { color: "white", fontSize: 14 },
-  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", alignItems: "center" },
-  modal: { backgroundColor: "white", padding: 20, borderRadius: 10, width: "80%", alignItems: "center" },
-  texto: { fontSize: 18, marginBottom: 20 },
-  fila: { flexDirection: "row", justifyContent: "space-between", width: "100%" },
-  botonAccion: { flex: 1, marginHorizontal: 5, padding: 10, borderRadius: 5, alignItems: "center" },
-  cancelar: { backgroundColor: "#b4afafff" },
-  confirmar: { backgroundColor: "#ff4444" },
-  textoAccion: { color: "white", fontWeight: "bold" },
+  boton: { 
+    padding: 5, 
+    borderRadius: 5, 
+    backgroundColor: "#f19090", 
+    alignItems: "center" 
+  },
+  textoBoton: { 
+    color: "white", 
+    fontSize: 14 
+  },
+  overlay: { 
+    flex: 1, 
+    backgroundColor: "rgba(0,0,0,0.5)", 
+    justifyContent: "center", 
+    alignItems: "center" 
+  },
+  modal: { 
+    backgroundColor: "white", 
+    padding: 20, 
+    borderRadius: 10, 
+    width: "80%", 
+    alignItems: "center" 
+  },
+  texto: { 
+    fontSize: 18, 
+    marginBottom: 20 
+  },
+  fila: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    width: "100%" 
+  },
+  botonAccion: { 
+    flex: 1, 
+    marginHorizontal: 5, 
+    padding: 10, 
+    borderRadius: 5, 
+    alignItems: "center" 
+  },
+  cancelar: { 
+    backgroundColor: "#b4afafff" 
+  },
+  confirmar: { 
+    backgroundColor: "#ff4444" 
+  },
+  textoAccion: { 
+    color: "white", 
+    fontWeight: "bold" 
+  },
 });
 
 export default BotonEliminarEmpleado;

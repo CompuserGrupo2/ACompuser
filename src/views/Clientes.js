@@ -4,7 +4,6 @@ import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
 import FormularioClientes from "../Componentes/Clientes/FormularioClientes";
 import ListaClientes from "../Componentes/Clientes/ListaClientes";
-import TablaClientes from "../Componentes/Clientes/TablaClientes";
 
 const Clientes = ({ setPantalla }) => {
   const [clientes, setClientes] = useState([]);
@@ -56,13 +55,7 @@ const Clientes = ({ setPantalla }) => {
         nuevoCliente.telefono.trim() &&
         nuevoCliente.tipo_cliente
       ) {
-        await addDoc(collection(db, "Clientes"), {
-          nombre: nuevoCliente.nombre.trim(),
-          apellido: nuevoCliente.apellido.trim(),
-          cedula: nuevoCliente.cedula.trim(),
-          telefono: nuevoCliente.telefono.trim(),
-          tipo_cliente: nuevoCliente.tipo_cliente,
-        });
+        await addDoc(collection(db, "Clientes"), nuevoCliente);
         setNuevoCliente({
           nombre: "",
           apellido: "",
@@ -83,46 +76,24 @@ const Clientes = ({ setPantalla }) => {
 
   const actualizarCliente = async () => {
     try {
-      if (
-        nuevoCliente.nombre.trim() &&
-        nuevoCliente.apellido.trim() &&
-        nuevoCliente.cedula.trim() &&
-        nuevoCliente.telefono.trim() &&
-        nuevoCliente.tipo_cliente
-      ) {
-        await updateDoc(doc(db, "Clientes", clienteId), {
-          nombre: nuevoCliente.nombre.trim(),
-          apellido: nuevoCliente.apellido.trim(),
-          cedula: nuevoCliente.cedula.trim(),
-          telefono: nuevoCliente.telefono.trim(),
-          tipo_cliente: nuevoCliente.tipo_cliente,
-        });
-        setNuevoCliente({
-          nombre: "",
-          apellido: "",
-          cedula: "",
-          telefono: "",
-          tipo_cliente: "",
-        });
-        setModoEdicion(false);
-        setClienteId(null);
-        cargarDatos();
-      } else {
-        alert("Por favor, complete todos los campos.");
-      }
+      await updateDoc(doc(db, "Clientes", clienteId), nuevoCliente);
+      setNuevoCliente({
+        nombre: "",
+        apellido: "",
+        cedula: "",
+        telefono: "",
+        tipo_cliente: "",
+      });
+      setModoEdicion(false);
+      setClienteId(null);
+      cargarDatos();
     } catch (error) {
       console.error("Error al actualizar cliente: ", error);
     }
   };
 
   const editarCliente = (cliente) => {
-    setNuevoCliente({
-      nombre: cliente.nombre,
-      apellido: cliente.apellido,
-      cedula: cliente.cedula,
-      telefono: cliente.telefono,
-      tipo_cliente: cliente.tipo_cliente,
-    });
+    setNuevoCliente(cliente);
     setClienteId(cliente.id);
     setModoEdicion(true);
   };
@@ -141,10 +112,10 @@ const Clientes = ({ setPantalla }) => {
         modoEdicion={modoEdicion}
         cargarDatos={cargarDatos}
       />
-      <ListaClientes clientes={clientes} />
-      <TablaClientes
+
+      {/* 🔹 Solo usamos la lista ahora */}
+      <ListaClientes
         clientes={clientes}
-        eliminarCliente={eliminarCliente}
         editarCliente={editarCliente}
         cargarDatos={cargarDatos}
       />
@@ -158,7 +129,6 @@ const Clientes = ({ setPantalla }) => {
       keyExtractor={(item) => item.id}
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
-      ListFooterComponent={<View style={{ height: 20 }} />}
     />
   );
 };
@@ -170,10 +140,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-  },
-  buttonContainer: {
-    marginTop: 20,
-    marginBottom: 20,
   },
 });
 

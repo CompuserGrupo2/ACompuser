@@ -1,14 +1,30 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import BotonEliminarEquipo from "../Equipos/BotonEliminarEquipo"; 
 
-const ListaEmpleados = ({ empleados }) => {
-
+const ListaEmpleados = ({ empleados, eliminarEmpleado, editarEmpleado }) => {
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-      <Text style={styles.titulo}>{item.nombre} {item.apellido}</Text>
-      <Text style={styles.detalle}>Cédula: {item.cedula}</Text>
-      <Text style={styles.detalle}>Teléfono: {item.telefono}</Text>
-      <Text style={styles.tipo}>Dirección: {item.direccion}</Text>
+      <View style={styles.infoContainer}>
+        <Text style={styles.titulo}>{item.nombre} {item.apellido}</Text>
+        <Text style={styles.detalle}>Cédula: {item.cedula}</Text>
+        <Text style={styles.detalle}>Teléfono: {item.telefono}</Text>
+        <Text style={styles.tipo}>Dirección: {item.direccion}</Text>
+      </View>
+
+      <View style={styles.accionesContainer}>
+        <TouchableOpacity
+          style={styles.botonActualizar}
+          onPress={() => editarEmpleado(item)}
+        >
+          <Text style={styles.icono}>✏️</Text>
+        </TouchableOpacity>
+
+        <BotonEliminarEquipo
+          id={item.id}
+          eliminarEquipo={eliminarEmpleado} 
+        />
+      </View>
     </View>
   );
 
@@ -26,8 +42,16 @@ const ListaEmpleados = ({ empleados }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 15 },
-  header: { fontSize: 22, fontWeight: "bold", marginBottom: 15, textAlign: "center" },
+  container: { 
+    flex: 1, 
+    padding: 15 
+  },
+  header: { 
+    fontSize: 22, 
+    fontWeight: "bold", 
+    marginBottom: 15, 
+    textAlign: "left" 
+  },
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -39,21 +63,40 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
   },
+  infoContainer: {
+    marginBottom: 10,
+  },
   titulo: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 6
+    marginBottom: 6,
   },
   detalle: {
     fontSize: 14,
     marginBottom: 3,
-    color: "#333"
+    color: "#333",
   },
   tipo: {
     fontSize: 14,
     fontWeight: "bold",
     color: "#7E84F2",
-    marginTop: 5
+    marginTop: 5,
+  },
+  accionesContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: 10,
+  },
+  botonActualizar: {
+    padding: 4,
+    borderRadius: 5,
+    backgroundColor: "#99c99aff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  icono: {
+    fontSize: 16,
   },
 });
 

@@ -22,8 +22,8 @@ const Home = () => {
       <View style={styles.section}>
         <Text style={styles.subtitle}>Nuestra Visión</Text>
         <Text style={styles.text}>
-          Ser la empresa líder en soluciones de cómputo y tecnología, reconocida por la innovación, 
-          el servicio al cliente y la confianza, impulsando la transformación digital.
+            Ser la empresa líder en soluciones de cómputo y tecnología, reconocida por la innovación, 
+            el servicio al cliente y la confianza, impulsando la transformación digital.
         </Text>
       </View>
 

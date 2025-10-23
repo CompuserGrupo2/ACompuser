@@ -38,7 +38,7 @@ const BotonEliminarEquipo = ({ id, eliminarEquipo }) => {
 
 const styles = StyleSheet.create({
   boton: {
-    padding: 4,
+    padding: 5,
     borderRadius: 5,
     backgroundColor:
     "#f19090",

@@ -1,12 +1,29 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import BotonEliminarEquipo from "../Equipos/BotonEliminarEquipo"; 
 
-const ListaUsuarios = ({ usuarios }) => {
+const ListaUsuarios = ({ usuarios, eliminarUsuario, editarUsuario }) => {
   const renderItem = ({ item }) => (
-    <View style={styles.cardRow}>
-      <Text style={styles.usuario}>{item.usuario}</Text>
-      <Text style={styles.correo}>{item.correo}</Text>
-      <Text style={styles.rol}>{item.rol}</Text>
+    <View style={styles.card}>
+      <View style={styles.infoContainer}>
+        <Text style={styles.usuario}>{item.usuario}</Text>
+        <Text style={styles.correo}>{item.correo}</Text>
+        <Text style={styles.rol}>{item.rol}</Text>
+      </View>
+
+      <View style={styles.accionesContainer}>
+        <TouchableOpacity
+          style={styles.botonActualizar}
+          onPress={() => editarUsuario(item)}
+        >
+          <Text style={styles.icono}>✏️</Text>
+        </TouchableOpacity>
+
+        <BotonEliminarEquipo
+          id={item.id}
+          eliminarEquipo={eliminarUsuario}
+        />
+      </View>
     </View>
   );
 
@@ -17,7 +34,7 @@ const ListaUsuarios = ({ usuarios }) => {
         data={usuarios}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        style={styles.list}
+        contentContainerStyle={{ paddingBottom: 20 }}
       />
     </View>
   );
@@ -25,37 +42,33 @@ const ListaUsuarios = ({ usuarios }) => {
 
 const styles = StyleSheet.create({
   container: { 
+    flex: 1, 
     padding: 15 
   },
   titulo: { 
     fontSize: 22, 
-    fontWeight: "bold", 
+    fontWeight: "bold",
     marginBottom: 12, 
-    color: "#0D0D0D", 
     textAlign: "center" 
   },
-  list: {
-    flex: 1,
-  },
-  cardRow: {
-    flexDirection: "column",
+  card: {
     backgroundColor: "#fff",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    marginBottom: 8,
+    padding: 12,
+    marginBottom: 10,
     borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: "#f9f9fbff",
     elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
   },
+  infoContainer: { 
+    marginBottom: 10 
+  },
   usuario: { 
-    fontSize: 15, 
-    fontWeight: "500", 
-    color: "#0D0D0D" 
+    fontSize: 16, 
+    fontWeight: "bold", 
+    marginBottom: 4 
   },
   correo: { 
     fontSize: 14, 
@@ -65,6 +78,20 @@ const styles = StyleSheet.create({
     fontSize: 14, 
     color: "#666" 
   },
+  accionesContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: 10,
+  },
+  botonActualizar: {
+    padding: 4,
+    borderRadius: 5,
+    backgroundColor: "#99c99aff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  icono: { fontSize: 16 },
 });
 
 export default ListaUsuarios;

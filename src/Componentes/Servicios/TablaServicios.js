@@ -4,81 +4,88 @@ import BotonEliminarServicio from "./BotonEliminarServicio.js";
 
 const TablaServicios = ({ servicios, eliminarServicio, editarServicio }) => {
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.titulo}>Tabla de Servicios</Text>
 
-      <View style={[styles.fila, styles.encabezado]}>
-        <Text style={[styles.celda, styles.textoEncabezado]}>Descripción</Text>
-        <Text style={[styles.celda, styles.textoEncabezado]}>Costo</Text>
-        <Text style={[styles.celda, styles.textoEncabezado]}>Acciones</Text>
-      </View>
-
-      <ScrollView>
-        {servicios.map((item) => (
-          <View key={item.id} style={styles.fila}>
-            <Text style={styles.celda}>{item.descripcion}</Text>
-            <Text style={styles.celda}>C${item.costo}</Text>
-            <View style={styles.celdaAcciones}>
-              <TouchableOpacity
-                style={styles.botonActualizar}
-                onPress={() => editarServicio(item)}
-              >
-                <Text>✏️</Text>
-              </TouchableOpacity>
-              <BotonEliminarServicio id={item.id} eliminarServicio={eliminarServicio} />
-            </View>
+      {servicios.map((item) => (
+        <View key={item.id} style={styles.card}>
+          {/* Información del servicio */}
+          <View style={styles.infoContainer}>
+            <Text style={styles.descripcion}>{item.descripcion}</Text>
+            <Text style={styles.costo}>C${item.costo}</Text>
           </View>
-        ))}
-      </ScrollView>
-    </View>
+
+          {/* Acciones editar / eliminar */}
+          <View style={styles.accionesContainer}>
+            <TouchableOpacity
+              style={styles.botonActualizar}
+              onPress={() => editarServicio(item)}
+            >
+              <Text style={styles.icono}>✏️</Text>
+            </TouchableOpacity>
+
+            <BotonEliminarServicio
+              id={item.id}
+              eliminarServicio={eliminarServicio}
+            />
+          </View>
+        </View>
+      ))}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
-    alignSelf: "stretch",
+    paddingVertical: 10,
+    paddingHorizontal: 5,
   },
   titulo: {
     fontSize: 22,
     fontWeight: "bold",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+
+  // --- Nuevo estilo de tarjeta ---
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  infoContainer: {
     marginBottom: 10,
   },
-  fila: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-    paddingVertical: 6,
-    alignItems: "center",
-  },
-  encabezado: {
-    backgroundColor: "#59C1D9",
-  },
-  celda: {
-    flex: 1,
-    fontSize: 14,
-    textAlign: "center",
-  },
-  celdaAcciones: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 8,
-  },
-  textoEncabezado: {
-    fontWeight: "bold",
+  descripcion: {
     fontSize: 16,
-    textAlign: "center",
+    fontWeight: "bold",
+    marginBottom: 6,
+  },
+  costo: {
+    fontSize: 14,
+    color: "#333",
+  },
+  accionesContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: 10,
   },
   botonActualizar: {
     padding: 4,
     borderRadius: 5,
+    backgroundColor: "#99c99aff",
     alignItems: "center",
     justifyContent: "center",
-    alignSelf: "center",
-    backgroundColor: "#99c99aff",
+  },
+  icono: {
+    fontSize: 16,
   },
 });
 
