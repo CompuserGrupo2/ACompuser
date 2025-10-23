@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { Linking, TouchableOpacity } from 'react-native';
 
 const Home = () => {
   return (
@@ -36,22 +37,31 @@ const Home = () => {
         </Text>
       </View>
 
-      {/* Contacto */}
-      <View style={styles.info}>
-        <Text style={styles.subtitle}>Contáctenos</Text>
-        <View style={styles.contactRow}>
-          <View style={styles.contactColumn}>
-            <AntDesign name="phone" size={30} color="black" />
-            <Text style={styles.contactValue}>+505 5799 4806</Text>
-            
-          </View>
-          <View style={styles.contactColumn}>
-            <MaterialCommunityIcons name="gmail" size={30} color="black" />
-            <Text style={styles.contactValue}>compusergrupo@gmail.com</Text>
-            
+        {/* Contacto */}
+        <View style={styles.info}>
+          <Text style={styles.subtitle}>Contáctenos</Text>
+          <View style={styles.contactRow}>
+
+            {/* WhatsApp */}
+            <TouchableOpacity
+              style={styles.contactColumn}
+              onPress={() => Linking.openURL('https://wa.me/50557994806')}
+            >
+              <AntDesign name="phone" size={30} color="black" />
+              <Text style={styles.contactValue}>+505 5799 4806</Text>
+            </TouchableOpacity>
+
+            {/* Email */}
+            <TouchableOpacity
+              style={styles.contactColumn}
+              onPress={() => Linking.openURL('mailto:compusergrupo@gmail.com')}
+            >
+              <MaterialCommunityIcons name="gmail" size={30} color="black" />
+              <Text style={styles.contactValue}>compusergrupo@gmail.com</Text>
+            </TouchableOpacity>
+
           </View>
         </View>
-      </View>
     </ScrollView>
   );
 };

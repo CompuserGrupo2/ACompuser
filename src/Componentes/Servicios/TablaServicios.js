@@ -5,7 +5,7 @@ import BotonEliminarServicio from "./BotonEliminarServicio.js";
 const TablaServicios = ({ servicios, eliminarServicio, editarServicio }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.titulo}>Tabla de Servicios</Text>
+      <Text style={styles.titulo}>Lista de Servicios</Text>
 
       {servicios.map((item) => (
         <View key={item.id} style={styles.card}>
@@ -44,10 +44,8 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 12,
-    textAlign: "center",
+    textAlign: "left",
   },
-
-  // --- Nuevo estilo de tarjeta ---
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
