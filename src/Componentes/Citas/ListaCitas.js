@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import { db } from "../../Database/firebaseconfig";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 
 const ListaCitas = ({ actualizarLista }) => {
   const [citas, setCitas] = useState([]);
 
   const cargarCitas = async () => {
-    try {
-      const snapshot = await getDocs(collection(db, "Citas"));
+  try {
+      const citasQuery = query(collection(db, "Citas"), orderBy("fecha_cita", "asc"));
+      const snapshot = await getDocs(citasQuery);
       const datos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setCitas(datos);
     } catch (error) {
