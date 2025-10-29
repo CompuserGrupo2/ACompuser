@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Alert, TouchableOpacity, Platform } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { db } from "../../Database/firebaseconfig";
 import { collection, addDoc } from "firebase/firestore";
+import { auth, db } from "../../Database/firebaseconfig";
 
 const FormularioCitas = ({ cargarCitas }) => {
   const [fecha, setFecha] = useState(new Date());
@@ -16,9 +16,12 @@ const FormularioCitas = ({ cargarCitas }) => {
     }
 
     try {
+      const user = auth.currentUser;
       await addDoc(collection(db, "Citas"), {
         fecha_cita: fecha.toISOString(),
         estado: "pendiente",
+        creado_en: new Date(),
+        actualizado_en: new Date(),
       });
 
       Alert.alert("✅ Cita agendada con éxito");
@@ -26,7 +29,7 @@ const FormularioCitas = ({ cargarCitas }) => {
       cargarCitas();
     } catch (error) {
       console.error("Error al guardar la cita:", error);
-      Alert.alert("Error al guardar la cita", error.message);
+      Alert.alert("❌ Error al guardar la cita", error.message);
     }
   };
 
@@ -77,46 +80,40 @@ const FormularioCitas = ({ cargarCitas }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    padding: 20, 
-    backgroundColor: "#f5f7fa", 
-    borderRadius: 10, 
-    marginBottom: 20 
+  container: {
+    padding: 20,
+    backgroundColor: "#f5f7fa",
+    borderRadius: 10,
+    marginBottom: 20,
   },
-
-  titulo: { 
-    fontSize: 24, 
-    fontWeight: "bold", 
-    marginBottom: 15, 
-    textAlign: "center" 
+  titulo: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 15,
+    textAlign: "center",
   },
-
-  label: { 
-    fontWeight: "bold", 
-    marginBottom: 5 
+  label: {
+    fontWeight: "bold",
+    marginBottom: 5,
   },
-
-  inputFecha: { 
-    padding: 12, 
-    borderWidth: 1, 
-    borderColor: "#ccc", 
-    borderRadius: 8, 
-    marginBottom: 20, 
-    backgroundColor: "#fff" 
+  inputFecha: {
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    marginBottom: 20,
+    backgroundColor: "#fff",
   },
-
-  boton: { 
-    backgroundColor: "#4a90e2", 
-    padding: 10, 
-    borderRadius: 5, 
-    
-    alignItems: "center" 
+  boton: {
+    backgroundColor: "#5b9ce5ff",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
   },
-
-  textoBoton: { 
-    color: "#fff", 
-    fontSize: 18, 
-    fontWeight: "bold" 
+  textoBoton: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
 

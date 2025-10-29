@@ -78,12 +78,13 @@ function MyTabsCliente({ cerrarSesion }) {
       />
       <Tab.Screen
         name="Citas"
-        component={Citas}
         options={{
           tabBarLabel: "Citas",
           tabBarIcon: ({ color }) => <FontAwesome name="calendar" size={24} color={color} />,
         }}
-      />
+      >
+        {() => <Citas rol="Cliente" />}
+      </Tab.Screen>
       <Tab.Screen
         name="CerrarSesion"
         options={{
@@ -127,12 +128,13 @@ function MyTabsAdmin({ cerrarSesion }) {
       />
       <Tab.Screen
         name="Citas"
-        component={Citas}
         options={{
           tabBarLabel: "Citas",
           tabBarIcon: ({ color }) => <FontAwesome name="calendar" size={24} color={color} />,
         }}
-      />
+      >
+        {() => <Citas rol="Admin" />}
+      </Tab.Screen>
       <Tab.Screen
         name="Clientes"
         component={Clientes}
@@ -237,4 +239,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-
