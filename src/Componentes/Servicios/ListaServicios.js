@@ -9,16 +9,33 @@ import {
   Image,
   ActivityIndicator,
   Modal,
+  TextInput,
+  Alert,
+  ScrollView,
 } from "react-native";
 import { db } from "../../Database/firebaseconfig";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  query,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
+import { getAuth } from "firebase/auth";
 
 const ListaServicios = ({ navigation }) => {
   const [servicios, setServicios] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [comentariosSeleccionados, setComentariosSeleccionados] = useState([]);
+  const [servicioIdSeleccionado, setServicioIdSeleccionado] = useState(null);
+  const [calificacion, setCalificacion] = useState(5);
+  const [comentario, setComentario] = useState("");
+  const [enviando, setEnviando] = useState(false);
+
+  const auth = getAuth();
+  const usuario = auth.currentUser;
 
   useEffect(() => {
     const q = query(collection(db, "Servicios"));
@@ -67,19 +84,49 @@ const ListaServicios = ({ navigation }) => {
     return () => unsubscribe();
   }, []);
 
-  const abrirComentarios = (calificaciones) => {
+  const abrirComentarios = (calificaciones, servicioId) => {
     setComentariosSeleccionados(calificaciones || []);
+    setServicioIdSeleccionado(servicioId);
     setModalVisible(true);
+  };
+
+  const enviarCalificacion = async () => {
+    if (!usuario) {
+      Alert.alert("Error", "Debes iniciar sesión para calificar.");
+      return;
+    }
+
+    if (enviando) return;
+
+    setEnviando(true);
+
+    try {
+      await addDoc(collection(db, "Servicios", servicioIdSeleccionado, "Calificaciones"), {
+        Calidad_servicio: calificacion,
+        comentario: comentario.trim() || null,
+        fecha_calificacion: serverTimestamp(),
+        usuario_id: usuario.uid,
+        usuario_email: usuario.email,
+      });
+
+      Alert.alert("Éxito", "¡Calificación enviada!");
+      setComentario("");
+      setCalificacion(5);
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error al enviar calificación:", error);
+      Alert.alert("Error", "No se pudo enviar la calificación.");
+    } finally {
+      setEnviando(false);
+    }
   };
 
   const renderItem = ({ item }) => (
     <View style={styles.cardRow}>
-      {/* Ícono del servicio */}
       <View style={styles.iconContainer}>
         <MaterialIcons name="build" size={26} color="#7E84F2" />
       </View>
 
-      {/* Información del servicio */}
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }}>
@@ -96,10 +143,9 @@ const ListaServicios = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Ícono de comentarios */}
       <TouchableOpacity
         style={styles.comentarioBtn}
-        onPress={() => abrirComentarios(item.calificaciones)}
+        onPress={() => abrirComentarios(item.calificaciones, item.id)}
       >
         <FontAwesome name="comment" size={24} color="#369AD9" />
         <Text style={styles.comentarioCount}>
@@ -128,7 +174,7 @@ const ListaServicios = ({ navigation }) => {
         contentContainerStyle={{ paddingBottom: 40 }}
       />
 
-      {/* Modal de Comentarios */}
+      {/* Modal de Comentarios + Formulario */}
       <Modal
         visible={modalVisible}
         transparent={true}
@@ -144,14 +190,12 @@ const ListaServicios = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            {comentariosSeleccionados.length > 0 ? (
-              <FlatList
-                data={comentariosSeleccionados}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item: cal }) => (
-                  <View style={styles.comentarioItem}>
+            <ScrollView style={{ maxHeight: "60%" }}>
+              {comentariosSeleccionados.length > 0 ? (
+                comentariosSeleccionados.map((cal) => (
+                  <View key={cal.id} style={styles.comentarioItem}>
                     <Text style={styles.comentarioFecha}>
-                      {cal.fecha_calificacion || "Sin fecha"}
+                      {cal.fecha_calificacion?.toDate?.().toLocaleDateString() || "Sin fecha"}
                     </Text>
                     <View style={styles.calificacionContainer}>
                       <FontAwesome name="star" size={16} color="#F9A825" />
@@ -163,13 +207,52 @@ const ListaServicios = ({ navigation }) => {
                       {cal.comentario || "Sin comentario"}
                     </Text>
                   </View>
-                )}
+                ))
+              ) : (
+                <Text style={styles.sinComentariosModal}>
+                  No hay comentarios aún. ¡Sé el primero!
+                </Text>
+              )}
+            </ScrollView>
+
+            {/* Formulario de nueva calificación */}
+            <View style={styles.formContainer}>
+              <Text style={styles.formLabel}>Tu calificación:</Text>
+              <View style={styles.estrellasContainer}>
+                {[1, 2, 3, 4, 5].map((estrella) => (
+                  <TouchableOpacity
+                    key={estrella}
+                    onPress={() => setCalificacion(estrella)}
+                  >
+                    <FontAwesome
+                      name={estrella <= calificacion ? "star" : "star-o"}
+                      size={28}
+                      color="#F9A825"
+                      style={{ marginHorizontal: 4 }}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TextInput
+                style={styles.inputComentario}
+                placeholder="Escribe tu comentario (opcional)"
+                value={comentario}
+                onChangeText={setComentario}
+                multiline
+                numberOfLines={3}
               />
-            ) : (
-              <Text style={styles.sinComentariosModal}>
-                No hay comentarios aún.
-              </Text>
-            )}
+
+              <TouchableOpacity
+                style={[styles.btnEnviar, enviando && { opacity: 0.6 }]}
+                onPress={enviarCalificacion}
+                disabled={enviando}
+              >
+                <Text style={styles.btnText}>
+                  {enviando ? "Enviando..." : "Enviar Calificación"}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -264,7 +347,7 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: "#FFF",
     width: "90%",
-    maxHeight: "80%",
+    maxHeight: "85%",
     borderRadius: 15,
     padding: 15,
   },
@@ -310,8 +393,46 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#777",
     fontStyle: "italic",
-    marginTop: 20,
+    marginVertical: 20,
     fontSize: 15,
+  },
+  formContainer: {
+    marginTop: 15,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: "#EEE",
+  },
+  formLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#222",
+    marginBottom: 8,
+  },
+  estrellasContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  inputComentario: {
+    borderWidth: 1,
+    borderColor: "#DDD",
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 14,
+    backgroundColor: "#F9F9F9",
+    textAlignVertical: "top",
+    marginBottom: 12,
+  },
+  btnEnviar: {
+    backgroundColor: "#369AD9",
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  btnText: {
+    color: "#FFF",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   loading: {
     flex: 1,
