@@ -1,25 +1,34 @@
+// src/Componentes/Servicios/ListaServicios.js
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  Modal,
+} from "react-native";
 import { db } from "../../Database/firebaseconfig";
 import { collection, onSnapshot, query } from "firebase/firestore";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 
-const ListaServicios = () => {
+const ListaServicios = ({ navigation }) => {
   const [servicios, setServicios] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const [servicioSeleccionado, setServicioSeleccionado] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [comentariosSeleccionados, setComentariosSeleccionados] = useState([]);
 
   useEffect(() => {
     const q = query(collection(db, "Servicios"));
-    
-    // onSnapshot escucha cambios en tiempo real
+
     const unsubscribe = onSnapshot(q, async (snapshot) => {
       const datosServicios = [];
 
       for (const docSnapshot of snapshot.docs) {
         const servicioData = { id: docSnapshot.id, ...docSnapshot.data() };
 
-        // Calcular promedio de calificaciones
         const calificacionesRef = collection(db, "Servicios", docSnapshot.id, "Calificaciones");
         const calificacionesSnap = await onSnapshot(calificacionesRef, (calSnapshot) => {
           let suma = 0;
@@ -55,48 +64,49 @@ const ListaServicios = () => {
       setCargando(false);
     });
 
-    return () => unsubscribe(); // limpieza al desmontar
+    return () => unsubscribe();
   }, []);
 
-  const toggleDetalles = (id) => {
-    setServicioSeleccionado(servicioSeleccionado === id ? null : id);
+  const abrirComentarios = (calificaciones) => {
+    setComentariosSeleccionados(calificaciones || []);
+    setModalVisible(true);
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.cardRow} onPress={() => toggleDetalles(item.id)} activeOpacity={0.9}>
+    <View style={styles.cardRow}>
+      {/* Ícono del servicio */}
       <View style={styles.iconContainer}>
         <MaterialIcons name="build" size={26} color="#7E84F2" />
       </View>
+
+      {/* Información del servicio */}
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }}>
             <Text style={styles.descripcion}>{item.descripcion}</Text>
             <Text style={styles.costo}>C$ {item.costo}</Text>
-            <Text style={styles.calificacion}>
-              ⭐ {item.promedioCalificacion || "Sin calificación"}
-            </Text>
+            <View style={styles.calificacionContainer}>
+              <FontAwesome name="star" size={16} color="#F9A825" />
+              <Text style={styles.calificacion}>
+                {" "}{item.promedioCalificacion || "Sin calificación"}
+              </Text>
+            </View>
           </View>
           <Image source={{ uri: item.foto }} style={styles.preview} resizeMode="contain" />
         </View>
-
-        {servicioSeleccionado === item.id && item.calificaciones?.length > 0 && (
-          <View style={styles.detalleContainer}>
-            <Text style={styles.subtitulo}>📋 Detalles de calificaciones:</Text>
-            {item.calificaciones.map((cal, index) => (
-              <View key={index} style={styles.detalleItem}>
-                <Text style={styles.detalleTexto}><Text style={styles.label}>Fecha:</Text> {cal.fecha_calificacion || "Sin fecha"}</Text>
-                <Text style={styles.detalleTexto}><Text style={styles.label}>Puntuación:</Text> {cal.Calidad_servicio} ⭐</Text>
-                <Text style={styles.detalleTexto}><Text style={styles.label}>Comentario:</Text> {cal.comentario || "Sin comentario"}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {servicioSeleccionado === item.id && (!item.calificaciones || item.calificaciones.length === 0) && (
-          <Text style={styles.sinCalificaciones}>No hay calificaciones registradas aún.</Text>
-        )}
       </View>
-    </TouchableOpacity>
+
+      {/* Ícono de comentarios */}
+      <TouchableOpacity
+        style={styles.comentarioBtn}
+        onPress={() => abrirComentarios(item.calificaciones)}
+      >
+        <FontAwesome name="comment" size={24} color="#369AD9" />
+        <Text style={styles.comentarioCount}>
+          {item.calificaciones?.length || 0}
+        </Text>
+      </TouchableOpacity>
+    </View>
   );
 
   if (cargando) {
@@ -117,6 +127,52 @@ const ListaServicios = () => {
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 40 }}
       />
+
+      {/* Modal de Comentarios */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitulo}>Comentarios</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <MaterialIcons name="close" size={28} color="#333" />
+              </TouchableOpacity>
+            </View>
+
+            {comentariosSeleccionados.length > 0 ? (
+              <FlatList
+                data={comentariosSeleccionados}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item: cal }) => (
+                  <View style={styles.comentarioItem}>
+                    <Text style={styles.comentarioFecha}>
+                      {cal.fecha_calificacion || "Sin fecha"}
+                    </Text>
+                    <View style={styles.calificacionContainer}>
+                      <FontAwesome name="star" size={16} color="#F9A825" />
+                      <Text style={styles.comentarioPuntuacion}>
+                        {" "}{cal.Calidad_servicio}
+                      </Text>
+                    </View>
+                    <Text style={styles.comentarioTexto}>
+                      {cal.comentario || "Sin comentario"}
+                    </Text>
+                  </View>
+                )}
+              />
+            ) : (
+              <Text style={styles.sinComentariosModal}>
+                No hay comentarios aún.
+              </Text>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -125,14 +181,14 @@ const styles = StyleSheet.create({
   container: {
     padding: 15,
     backgroundColor: "#F5F7FA",
-    flex: 1
+    flex: 1,
   },
   titulo: {
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 15,
     color: "#0D0D0D",
-    textAlign: "center"
+    textAlign: "center",
   },
   cardRow: {
     flexDirection: "row",
@@ -147,7 +203,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 0
+    elevation: 0,
   },
   iconContainer: {
     backgroundColor: "#E6E8FC",
@@ -155,7 +211,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginRight: 10,
     justifyContent: "center",
-    alignItems: "center" },
+    alignItems: "center",
+  },
   preview: {
     width: 95,
     height: 95,
@@ -163,66 +220,104 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     backgroundColor: "#F0F1FF",
     borderWidth: 1,
-    borderColor: "#E2E5FF"
+    borderColor: "#E2E5FF",
   },
   descripcion: {
     fontSize: 16,
     fontWeight: "600",
     color: "#2C2C2C",
-    marginBottom: 3
+    marginBottom: 3,
   },
   costo: {
     fontSize: 15,
     color: "#369AD9",
     marginBottom: 4,
-    fontWeight: "500"
+    fontWeight: "500",
+  },
+  calificacionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   calificacion: {
     fontSize: 14,
     color: "#F9A825",
-    fontWeight: "600"
+    fontWeight: "600",
+    marginLeft: 4,
   },
-  detalleContainer: {
-    marginTop: 10,
-    backgroundColor: "#F9FAFB",
-    padding: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#EAEAEA"
+  comentarioBtn: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 10,
   },
-  subtitulo: {
+  comentarioCount: {
+    fontSize: 12,
+    color: "#369AD9",
+    fontWeight: "600",
+    marginTop: 2,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#FFF",
+    width: "90%",
+    maxHeight: "80%",
+    borderRadius: 15,
+    padding: 15,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EEE",
+  },
+  modalTitulo: {
+    fontSize: 18,
     fontWeight: "bold",
     color: "#222",
-    marginBottom: 6,
-    fontSize: 15
   },
-  detalleItem: {
-    marginBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-    paddingBottom: 6
+  comentarioItem: {
+    backgroundColor: "#F9FAFB",
+    padding: 12,
+    marginVertical: 6,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#EEE",
   },
-  detalleTexto: {
-    fontSize: 14,
-    color: "#444"
+  comentarioFecha: {
+    fontSize: 13,
+    color: "#666",
+    marginBottom: 4,
   },
-  label: {
+  comentarioPuntuacion: {
+    fontSize: 15,
     fontWeight: "600",
-    color: "#111"
+    color: "#F9A825",
+    marginLeft: 4,
   },
-  sinCalificaciones: {
-    marginTop: 8,
+  comentarioTexto: {
     fontSize: 14,
+    color: "#333",
+    marginTop: 4,
+  },
+  sinComentariosModal: {
+    textAlign: "center",
     color: "#777",
     fontStyle: "italic",
-    textAlign: "center"
+    marginTop: 20,
+    fontSize: 15,
   },
   loading: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
 });
 
 export default ListaServicios;
-
