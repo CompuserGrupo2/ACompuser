@@ -1,26 +1,9 @@
 // src/Componentes/Servicios/ListaServicios.js
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-  Modal,
-  TextInput,
-  Alert,
-  ScrollView,
-} from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator,
+         Modal, TextInput, Alert, ScrollView, } from "react-native";
 import { db } from "../../Database/firebaseconfig";
-import {
-  collection,
-  onSnapshot,
-  query,
-  addDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { collection, onSnapshot, query, addDoc, serverTimestamp } from "firebase/firestore";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
 
@@ -33,6 +16,9 @@ const ListaServicios = ({ navigation }) => {
   const [calificacion, setCalificacion] = useState(0);
   const [comentario, setComentario] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [busqueda, setBusqueda] = useState("");
+  const [serviciosFiltrados, setServiciosFiltrados] = useState([]);
+  const [filtroCalificacion, setFiltroCalificacion] = useState("ninguno");
 
   const auth = getAuth();
   const usuario = auth.currentUser;
@@ -83,6 +69,36 @@ const ListaServicios = ({ navigation }) => {
 
     return () => unsubscribe();
   }, []);
+
+  
+
+  //Busqueda + Filtro por calificación
+  useEffect(() => {
+    let listaFiltrada = [...servicios];
+
+    // Filtrar por búsqueda
+    if (busqueda.trim() !== "") {
+      listaFiltrada = listaFiltrada.filter((s) =>
+        s.descripcion.toLowerCase().includes(busqueda.toLowerCase())
+      );
+    }
+
+    // Filtrar por calificación
+    listaFiltrada.sort((a, b) => {
+      const calA = a.promedioCalificacion === "N/A" ? 0 : parseFloat(a.promedioCalificacion);
+      const calB = b.promedioCalificacion === "N/A" ? 0 : parseFloat(b.promedioCalificacion);
+
+      if (filtroCalificacion === "mejores") {
+        return calB - calA; // mayor a menor
+      } else if (filtroCalificacion === "peores") {
+        return calA - calB; // menor a mayor
+      } else {
+        return 0; // sin ordenar
+      }
+    });
+
+    setServiciosFiltrados(listaFiltrada);
+  }, [busqueda, filtroCalificacion, servicios]);
 
   const abrirComentarios = (calificaciones, servicioId) => {
     setComentariosSeleccionados(calificaciones || []);
@@ -174,8 +190,53 @@ const ListaServicios = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>Catálogo de Servicios</Text>
+
+      <View style={styles.barraBusqueda}>
+        <TextInput
+          style={styles.inputBusqueda}
+          placeholder="Buscar servicio..."
+          value={busqueda}
+          onChangeText={setBusqueda}
+        />
+        {busqueda.length > 0 && (
+          <TouchableOpacity onPress={() => setBusqueda("")} style={styles.botonBorrar}>
+            <MaterialIcons name="close" size={20} color="#999" />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <View style={styles.filtroContainer}>
+        <TouchableOpacity
+          style={[styles.filtroBtn, filtroCalificacion === "mejores" && styles.filtroActivo]}
+          onPress={() => setFiltroCalificacion("mejores")}
+        >
+          <Text style={filtroCalificacion === "mejores" ? styles.filtroActivoText : styles.filtroTexto}>
+            Mejores calificados
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.filtroBtn, filtroCalificacion === "peores" && styles.filtroActivo]}
+          onPress={() => setFiltroCalificacion("peores")}
+        >
+          <Text style={filtroCalificacion === "peores" ? styles.filtroActivoText : styles.filtroTexto}>
+            Peores calificados
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.filtroBtn, filtroCalificacion === "ninguno" && styles.filtroActivo]}
+          onPress={() => setFiltroCalificacion("ninguno")}
+        >
+          <Text style={filtroCalificacion === "ninguno" ? styles.filtroActivoText : styles.filtroTexto}>
+            Quitar filtro
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+
       <FlatList
-        data={servicios}
+        data={serviciosFiltrados}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 40 }}
@@ -273,6 +334,7 @@ const ListaServicios = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 15,
+    paddingTop: 40,
     backgroundColor: "#F5F7FA",
     flex: 1,
   },
@@ -450,10 +512,54 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   nombreUsuario: {
-  fontSize: 15,
-  fontWeight: "600",
-  color: "#2C3E50",         // gris oscuro elegante
-  marginBottom: 2,
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#2C3E50",
+    marginBottom: 2,
+  },
+  barraBusqueda: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#DDD",
+    marginBottom: 12,
+    paddingHorizontal: 10,
+  },
+  inputBusqueda: {
+    flex: 1,
+    paddingVertical: 8,
+    fontSize: 15,
+  },
+  botonBorrar: {
+    marginLeft: 6,
+    padding: 4,
+  },
+  filtroContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    marginBottom: 12,
+    gap: 6,
+  },
+  filtroBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#369AD9",
+  },
+  filtroActivo: {
+    backgroundColor: "#369AD9",
+  },
+  filtroTexto: {
+    color: "#369AD9",
+    fontWeight: "600",
+  },
+  filtroActivoText: {
+    color: "#FFF",
+    fontWeight: "600",
   },
 });
 
