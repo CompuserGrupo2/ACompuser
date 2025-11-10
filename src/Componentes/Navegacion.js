@@ -58,6 +58,7 @@ function MyTabsCliente({ cerrarSesion }) {
         options={{
           tabBarLabel: "Inicio",
           tabBarIcon: ({ color }) => <AntDesign name="home" size={24} color={color} />,
+          headerShown: false,
         }}
       />
       <Tab.Screen
@@ -66,14 +67,6 @@ function MyTabsCliente({ cerrarSesion }) {
         options={{
           tabBarLabel: "Catálogo",
           tabBarIcon: ({ color }) => <FontAwesome name="image" size={24} color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="calificaciones"
-        component={FormularioCalificacion}
-        options={{
-          tabBarLabel: "Calificaciones",
-          tabBarIcon: ({ color }) => <FontAwesome name="star" size={24} color={color} />,
         }}
       />
       <Tab.Screen
@@ -108,6 +101,7 @@ function MyTabsAdmin({ cerrarSesion }) {
         options={{
           tabBarLabel: "Inicio",
           tabBarIcon: ({ color }) => <AntDesign name="home" size={24} color={color} />,
+          headerShown: false,
         }}
       />
       <Tab.Screen

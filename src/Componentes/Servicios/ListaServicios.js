@@ -30,7 +30,7 @@ const ListaServicios = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [comentariosSeleccionados, setComentariosSeleccionados] = useState([]);
   const [servicioIdSeleccionado, setServicioIdSeleccionado] = useState(null);
-  const [calificacion, setCalificacion] = useState(5);
+  const [calificacion, setCalificacion] = useState(0);
   const [comentario, setComentario] = useState("");
   const [enviando, setEnviando] = useState(false);
 
@@ -96,6 +96,12 @@ const ListaServicios = ({ navigation }) => {
       return;
     }
 
+    if (calificacion < 1 || calificacion > 5) {
+      Alert.alert("Error", "Selecciona una calificación.");
+      setEnviando(false);
+      return;
+    }
+
     if (enviando) return;
 
     setEnviando(true);
@@ -133,25 +139,26 @@ const ListaServicios = ({ navigation }) => {
             <Text style={styles.descripcion}>{item.descripcion}</Text>
             <Text style={styles.costo}>C$ {item.costo}</Text>
             <View style={styles.calificacionContainer}>
-              <FontAwesome name="star" size={16} color="#F9A825" />
+              <FontAwesome name="star" size={20} color="#F9A825" />
               <Text style={styles.calificacion}>
                 {" "}{item.promedioCalificacion || "Sin calificación"}
               </Text>
+
+              <TouchableOpacity
+                style={styles.comentarioBtn}
+                onPress={() => abrirComentarios(item.calificaciones, item.id)}
+              >
+                <FontAwesome name="comment" size={20} color="#369AD9" />
+                <Text style={styles.comentarioCount}>
+                  {item.calificaciones?.length || 0}
+                </Text>
+              </TouchableOpacity>
+
             </View>
           </View>
           <Image source={{ uri: item.foto }} style={styles.preview} resizeMode="contain" />
         </View>
       </View>
-
-      <TouchableOpacity
-        style={styles.comentarioBtn}
-        onPress={() => abrirComentarios(item.calificaciones, item.id)}
-      >
-        <FontAwesome name="comment" size={24} color="#369AD9" />
-        <Text style={styles.comentarioCount}>
-          {item.calificaciones?.length || 0}
-        </Text>
-      </TouchableOpacity>
     </View>
   );
 
@@ -194,14 +201,17 @@ const ListaServicios = ({ navigation }) => {
               {comentariosSeleccionados.length > 0 ? (
                 comentariosSeleccionados.map((cal) => (
                   <View key={cal.id} style={styles.comentarioItem}>
-                    <Text style={styles.comentarioFecha}>
-                      {cal.fecha_calificacion?.toDate?.().toLocaleDateString() || "Sin fecha"}
+                    <Text style={styles.nombreUsuario}>
+                      {cal.usuario_email || 'Usuario no registrado'}
                     </Text>
-                    <View style={styles.calificacionContainer}>
-                      <FontAwesome name="star" size={16} color="#F9A825" />
-                      <Text style={styles.comentarioPuntuacion}>
-                        {" "}{cal.Calidad_servicio}
+                      <Text style={styles.comentarioFecha}>
+                        {cal.fecha_calificacion?.toDate?.().toLocaleDateString() || "Sin fecha"}
                       </Text>
+                      <View style={styles.calificacionContainer}>
+                        <FontAwesome name="star" size={16} color="#F9A825" />
+                        <Text style={styles.comentarioPuntuacion}>
+                          {" "}{cal.Calidad_servicio}
+                        </Text>
                     </View>
                     <Text style={styles.comentarioTexto}>
                       {cal.comentario || "Sin comentario"}
@@ -328,15 +338,15 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   comentarioBtn: {
-    justifyContent: "center",
+    flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 10,
+    marginLeft: 10,
   },
   comentarioCount: {
-    fontSize: 12,
+    fontSize: 13,
     color: "#369AD9",
+    marginLeft: 4,
     fontWeight: "600",
-    marginTop: 2,
   },
   modalOverlay: {
     flex: 1,
@@ -438,6 +448,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  nombreUsuario: {
+  fontSize: 15,
+  fontWeight: "600",
+  color: "#2C3E50",         // gris oscuro elegante
+  marginBottom: 2,
   },
 });
 
