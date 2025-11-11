@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import { db } from "../../Database/firebaseconfig";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
-import { getAuth } from "firebase/auth"; // ← NUEVO
+import { getAuth } from "firebase/auth";
 import { confirmarCita, cancelarCita, posponerCita, editarCitaCliente } from "./accionesCitas";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import Icon from "react-native-vector-icons/MaterialIcons"; // ← Iconos reales
 
-const auth = getAuth(); // ← Usuario actual
+const auth = getAuth();
 
 const ListaCitas = ({ actualizarLista, rol }) => {
   const [citas, setCitas] = useState([]);
@@ -95,41 +96,63 @@ const ListaCitas = ({ actualizarLista, rol }) => {
     }
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.nombre}>Cliente: {item.nombreUsuario}</Text>
-      <Text style={styles.fecha}>Fecha: {item.fecha_cita.toLocaleString()}</Text>
-      <Text style={[styles.estado,
-        item.estado === "confirmado" ? styles.confirmado :
-        item.estado === "cancelada" ? styles.cancelada :
-        item.estado === "pospuesta" ? styles.pospuesta : styles.pendiente
-      ]}>
-        {item.estado}
-      </Text>
+  const renderItem = ({ item }) => {
+    const estadoConfig = {
+      confirmado: { icon: "check-circle", color: "#4CAF50", label: "Confirmado" },
+      pospuesta: { icon: "access-time", color: "#2196F3", label: "Pospuesto" },
+      cancelada: { icon: "cancel", color: "#f44336", label: "Cancelado" },
+      pendiente: { icon: "hourglass-empty", color: "#FF9800", label: "Pendiente" },
+    };
 
-      <View style={styles.botonesContainer}>
-        {rol === "Admin" ? (
-          <>
-            <TouchableOpacity style={[styles.boton, styles.botonConfirmar]} onPress={() => handleConfirmar(item.id)}>
-              <Text style={styles.textoBoton}>Confirmar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.boton, styles.botonPosponer]} onPress={() => abrirPicker("posponer", item)}>
-              <Text style={styles.textoBoton}>Posponer</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <TouchableOpacity style={[styles.boton, styles.botonEditar]} onPress={() => abrirPicker("editar", item)}>
-              <Text style={styles.textoBoton}>Editar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.boton, styles.botonCancelar]} onPress={() => handleCancelar(item.id)}>
-              <Text style={styles.textoBoton}>Cancelar</Text>
-            </TouchableOpacity>
-          </>
-        )}
+    const config = estadoConfig[item.estado] || estadoConfig.pendiente;
+
+    return (
+      <View style={styles.card}>
+        <Text style={styles.nombre}>Cliente: {item.nombreUsuario}</Text>
+        <Text style={styles.fecha}>Fecha: {item.fecha_cita.toLocaleString()}</Text>
+
+        {/* ESTADO CON ICONO REAL */}
+        <View style={[styles.estadoBadge, { backgroundColor: config.color + "20" }]}>
+          <Icon name={config.icon} size={18} color={config.color} style={styles.estadoIcon} />
+          <Text style={[styles.estadoTexto, { color: config.color }]}>{config.label}</Text>
+        </View>
+
+        <View style={styles.botonesContainer}>
+          {rol === "Admin" ? (
+            <>
+              <TouchableOpacity
+                style={[styles.boton, styles.botonConfirmar]}
+                onPress={() => handleConfirmar(item.id)}
+              >
+                <Text style={styles.textoBoton}>Confirmar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.boton, styles.botonPosponer]}
+                onPress={() => abrirPicker("posponer", item)}
+              >
+                <Text style={styles.textoBoton}>Posponer</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <TouchableOpacity
+                style={[styles.boton, styles.botonEditar]}
+                onPress={() => abrirPicker("editar", item)}
+              >
+                <Text style={styles.textoBoton}>Editar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.boton, styles.botonCancelar]}
+                onPress={() => handleCancelar(item.id)}
+              >
+                <Text style={styles.textoBoton}>Cancelar</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -154,22 +177,72 @@ const ListaCitas = ({ actualizarLista, rol }) => {
 };
 
 const styles = StyleSheet.create({
-  titulo: { fontSize: 22, fontWeight: "bold", marginBottom: 15, textAlign: "center" },
-  card: { backgroundColor: "#fff", padding: 15, borderRadius: 10, marginBottom: 10, elevation: 1 },
-  nombre: { fontSize: 16, fontWeight: "bold", color: "#2c3e50", marginBottom: 4 },
-  fecha: { fontSize: 14, color: "#555", marginBottom: 6 },
-  estado: { fontSize: 14, fontWeight: "bold", textTransform: "capitalize" },
-  confirmado: { color: "#4CAF50" },
-  cancelada: { color: "#f44336" },
-  pospuesta: { color: "#2196F3" },
-  pendiente: { color: "#FF9800" },
-  botonesContainer: { flexDirection: "row", justifyContent: "space-between", marginTop: 10 },
-  boton: { flex: 1, padding: 8, borderRadius: 5, marginHorizontal: 3, alignItems: "center" },
+  titulo: { 
+    fontSize: 22, 
+    fontWeight: "bold", 
+    marginBottom: 15, 
+    textAlign: "center",
+    color: "#2c3e50"
+  },
+  card: { 
+    backgroundColor: "#fff", 
+    padding: 18, 
+    borderRadius: 12, 
+    marginBottom: 12, 
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  nombre: { 
+    fontSize: 16, 
+    fontWeight: "bold", 
+    color: "#2c3e50", 
+    marginBottom: 4 
+  },
+  fecha: { 
+    fontSize: 14, 
+    color: "#555", 
+    marginBottom: 10 
+  },
+  estadoBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginBottom: 12,
+  },
+  estadoIcon: {
+    marginRight: 6,
+  },
+  estadoTexto: {
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  botonesContainer: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    marginTop: 5 
+  },
+  boton: { 
+    flex: 1, 
+    padding: 10, 
+    borderRadius: 8, 
+    marginHorizontal: 4, 
+    alignItems: "center" 
+  },
   botonConfirmar: { backgroundColor: "#4CAF50" },
   botonCancelar: { backgroundColor: "#f44336" },
   botonPosponer: { backgroundColor: "#2196F3" },
   botonEditar: { backgroundColor: "#FF9800" },
-  textoBoton: { color: "#fff", fontWeight: "bold", fontSize: 12 },
+  textoBoton: { 
+    color: "#fff", 
+    fontWeight: "bold", 
+    fontSize: 13 
+  },
 });
 
 export default ListaCitas;
