@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Alert, TouchableOpacity, Platform } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { auth, db } from "../../Database/firebaseconfig";
 
 const FormularioCitas = ({ cargarCitas }) => {
@@ -17,19 +17,28 @@ const FormularioCitas = ({ cargarCitas }) => {
 
     try {
       const user = auth.currentUser;
+      if (!user) {
+        Alert.alert("Debes iniciar sesión para agendar una cita.");
+        return;
+      }
+
+      // Nombre bonito: displayName o primera parte del email
+      const nombreUsuario = user.displayName || 
+        user.email.split("@")[0].charAt(0).toUpperCase() + user.email.split("@")[0].slice(1);
+
       await addDoc(collection(db, "Citas"), {
-        fecha_cita: fecha.toISOString(),
+        fecha_cita: Timestamp.fromDate(fecha),
         estado: "pendiente",
-        creado_en: new Date(),
-        actualizado_en: new Date(),
+        nombreUsuario: nombreUsuario,
+        creado_en: Timestamp.fromDate(new Date()),
       });
 
-      Alert.alert("✅ Cita agendada con éxito");
+      Alert.alert("Cita agendada con éxito");
       setFecha(new Date());
       cargarCitas();
     } catch (error) {
       console.error("Error al guardar la cita:", error);
-      Alert.alert("❌ Error al guardar la cita", error.message);
+      Alert.alert("Error", error.message);
     }
   };
 
@@ -105,7 +114,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   boton: {
-    backgroundColor: "#5b9ce5ff",
+    backgroundColor: "#5b9ce5",
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
