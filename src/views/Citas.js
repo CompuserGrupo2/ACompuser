@@ -19,7 +19,7 @@ const Citas = ({ rol }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 15, backgroundColor: "#f0f2f5" },
+  container: { flex: 1, paddingTop: 40, padding: 15, backgroundColor: "#f0f2f5" },
 });
 
 export default Citas;

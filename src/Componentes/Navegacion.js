@@ -51,14 +51,13 @@ function CerrarSesionScreen({ cerrarSesion }) {
 // Tabs CLIENTE
 function MyTabsCliente({ cerrarSesion }) {
   return (
-    <Tab.Navigator initialRouteName="Home" screenOptions={{ tabBarActiveTintColor: "blue" }}>
+    <Tab.Navigator initialRouteName="Home" screenOptions={{ tabBarActiveTintColor: "blue", headerShown: false }}>
       <Tab.Screen
         name="Home"
         component={Home}
         options={{
           tabBarLabel: "Inicio",
           tabBarIcon: ({ color }) => <AntDesign name="home" size={24} color={color} />,
-          headerShown: false,
         }}
       />
       <Tab.Screen

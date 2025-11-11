@@ -1,14 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, Linking, Dimensions } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { LinearGradient } from 'expo-linear-gradient';
 import Swiper from 'react-native-swiper';
 import * as Animatable from 'react-native-animatable';
+import { getAuth } from "firebase/auth";
 
 const { width } = Dimensions.get('window');
 
 const Home = () => {
+  
+  const [usuarioNombre, setUsuarioNombre] = useState('');
+
+  useEffect(() => {
+    const auth = getAuth();
+    const usuario = auth.currentUser;
+    if (usuario) {
+      // Si Firebase tiene displayName lo usamos, sino mostramos el correo
+      setUsuarioNombre(usuario.displayName || usuario.email);
+    }
+  }, []);
+
   return (
     <ScrollView contentContainerStyle={styles.container}> 
 
@@ -19,6 +32,10 @@ const Home = () => {
         />
         <Text style={styles.headerTitle}>Compuser</Text>
       </LinearGradient>
+
+      <Text style={styles.bienvenida}>
+        ¡Bienvenido, {usuarioNombre || "Usuario"}! 👋
+      </Text>
 
       <Animatable.View animation="fadeInDown" duration={1000} style={styles.carouselContainer}>
         <Swiper
@@ -183,4 +200,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     opacity: 0.8,
   },
+  bienvenida: {
+  fontSize: 20,
+  fontWeight: "bold",
+  textAlign: "center",
+  marginVertical: 15,
+  color: "#369AD9",
+},
 });
