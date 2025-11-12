@@ -1,5 +1,17 @@
-import React from "react";
-import { View, TextInput, Text, Alert, StyleSheet, TouchableHighlight } from "react-native";
+import React, { useRef, useEffect } from "react";
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+  Animated,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { BlurView } from "expo-blur";
 import SelectorClientes from "./SelectorClientes";
 
 const FormularioEquipos = ({
@@ -8,79 +20,178 @@ const FormularioEquipos = ({
   guardarEquipo,
   actualizarEquipo,
   modoEdicion,
-  cargarDatos,
+  visible,
+  setVisible,
 }) => {
+  // Animaciones
+  const slideAnim = useRef(new Animated.Value(300)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 300,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [visible]);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.titulo}>
-        {modoEdicion ? "Actualizar Equipo" : "Registro de Equipos"}
-      </Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Color"
-        value={nuevoEquipo.color}
-        onChangeText={(valor) => manejoCambio("color", valor)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Marca"
-        value={nuevoEquipo.marca}
-        onChangeText={(valor) => manejoCambio("marca", valor)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Modelo"
-        value={nuevoEquipo.modelo}
-        onChangeText={(valor) => manejoCambio("modelo", valor)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Tipo"
-        value={nuevoEquipo.tipo}
-        onChangeText={(valor) => manejoCambio("tipo", valor)}
-      />
-      <SelectorClientes
-        onClienteSeleccionado={(cliente) => manejoCambio("cliente", cliente)}
-        clienteSeleccionado={nuevoEquipo.cliente}
-      />
-      <TouchableHighlight
-        style={styles.boton}
-        underlayColor="#0056b3"
-        onPress={modoEdicion ? actualizarEquipo : guardarEquipo}
-      >
-        <Text style={styles.textoBoton}>
-          {modoEdicion ? "Actualizar" : "Guardar"}
-        </Text>
-      </TouchableHighlight>
-    </View>
+    <Modal
+      visible={visible}
+      animationType="none"
+      transparent
+      onRequestClose={() => setVisible(false)}
+    >
+      <BlurView intensity={40} tint="dark" style={styles.overlay}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={() => setVisible(false)} />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1, justifyContent: "flex-end" }}
+        >
+          <Animated.View
+            style={[
+              styles.panel,
+              {
+                transform: [{ translateY: slideAnim }],
+                opacity: fadeAnim,
+              },
+            ]}
+          >
+            <Text style={styles.titulo}>
+              {modoEdicion ? "Actualizar Equipo" : "Registrar Equipo"}
+            </Text>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Color"
+              value={nuevoEquipo.color}
+              onChangeText={(v) => manejoCambio("color", v)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Marca"
+              value={nuevoEquipo.marca}
+              onChangeText={(v) => manejoCambio("marca", v)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Modelo"
+              value={nuevoEquipo.modelo}
+              onChangeText={(v) => manejoCambio("modelo", v)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Tipo"
+              value={nuevoEquipo.tipo}
+              onChangeText={(v) => manejoCambio("tipo", v)}
+            />
+
+            <Text style={styles.label}>Cliente Asociado</Text>
+            
+              <SelectorClientes
+                onClienteSeleccionado={(c) => manejoCambio("cliente", c)}
+                clienteSeleccionado={nuevoEquipo.cliente}
+              />
+            <TouchableOpacity
+              style={styles.boton}
+              onPress={modoEdicion ? actualizarEquipo : guardarEquipo}
+            >
+              <Text style={styles.textoBoton}>
+                {modoEdicion ? "Actualizar" : "Guardar"}
+              </Text>
+            </TouchableOpacity>
+
+            <Pressable onPress={() => setVisible(false)}>
+              <Text style={styles.cancelar}>Cancelar</Text>
+            </Pressable>
+          </Animated.View>
+        </KeyboardAvoidingView>
+      </BlurView>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.3)",
+  },
+  panel: {
+    backgroundColor: "#fff",
+    padding: 25,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 10,
   },
   titulo: {
     fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 10,
+    color: "#000000ff",
+    marginBottom: 15,
+    textAlign: "center",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
+    borderColor: "#E0E0E0",
+    backgroundColor: "#F9FAFB",
+    borderRadius: 8,
+    padding: 12,
     marginBottom: 10,
   },
+  label: {
+    fontWeight: "600",
+    marginBottom: 5,
+    color: "#374151",
+  },
+  selectorContainer: {
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 8,
+    backgroundColor: "#F9FAFB",
+    marginBottom: 15,
+    padding: 4,
+  },
   boton: {
-    backgroundColor: "#007BFF",
-    padding: 12,
-    borderRadius: 5,
+    backgroundColor: "#369AD9",
+    padding: 14,
+    borderRadius: 10,
     alignItems: "center",
+    marginTop: 10,
   },
   textoBoton: {
     color: "#fff",
-    fontSize: 16,
     fontWeight: "bold",
+    fontSize: 16,
+  },
+  cancelar: {
+    textAlign: "center",
+    marginTop: 15,
+    color: "#9CA3AF",
   },
 });
 

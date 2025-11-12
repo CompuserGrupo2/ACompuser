@@ -1,11 +1,12 @@
 // src/Componentes/Servicios/ListaServicios.js
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator,
-         Modal, TextInput, Alert, ScrollView, } from "react-native";
+         Modal, TextInput, Alert, ScrollView } from "react-native";
 import { db } from "../../Database/firebaseconfig";
 import { collection, onSnapshot, query, addDoc, serverTimestamp } from "firebase/firestore";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
+import { LinearGradient } from "expo-linear-gradient"; // AGREGADO
 
 const ListaServicios = ({ navigation }) => {
   const [servicios, setServicios] = useState([]);
@@ -70,30 +71,26 @@ const ListaServicios = ({ navigation }) => {
     return () => unsubscribe();
   }, []);
 
-  
-
-  //Busqueda + Filtro por calificación
+  // Busqueda + Filtro por calificación
   useEffect(() => {
     let listaFiltrada = [...servicios];
 
-    // Filtrar por búsqueda
     if (busqueda.trim() !== "") {
       listaFiltrada = listaFiltrada.filter((s) =>
         s.descripcion.toLowerCase().includes(busqueda.toLowerCase())
       );
     }
 
-    // Filtrar por calificación
     listaFiltrada.sort((a, b) => {
       const calA = a.promedioCalificacion === "N/A" ? 0 : parseFloat(a.promedioCalificacion);
       const calB = b.promedioCalificacion === "N/A" ? 0 : parseFloat(b.promedioCalificacion);
 
       if (filtroCalificacion === "mejores") {
-        return calB - calA; // mayor a menor
+        return calB - calA;
       } else if (filtroCalificacion === "peores") {
-        return calA - calB; // menor a mayor
+        return calA - calB;
       } else {
-        return 0; // sin ordenar
+        return 0;
       }
     });
 
@@ -169,7 +166,6 @@ const ListaServicios = ({ navigation }) => {
                   {item.calificaciones?.length || 0}
                 </Text>
               </TouchableOpacity>
-
             </View>
           </View>
           <Image source={{ uri: item.foto }} style={styles.preview} resizeMode="contain" />
@@ -187,9 +183,12 @@ const ListaServicios = ({ navigation }) => {
     );
   }
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.titulo}>Catálogo de Servicios</Text>
+  const renderContent = () => (
+    <View>
+      {/* ENCABEZADO 100% IGUAL AL DE EQUIPOS */}
+      <LinearGradient colors={['#0057ff', '#00c6ff']} style={styles.header}>
+        <Text style={styles.headerTitle}>Catálogo de Servicios</Text>
+      </LinearGradient>
 
       <View style={styles.barraBusqueda}>
         <TextInput
@@ -234,7 +233,6 @@ const ListaServicios = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-
       <FlatList
         data={serviciosFiltrados}
         keyExtractor={(item) => item.id}
@@ -265,14 +263,14 @@ const ListaServicios = ({ navigation }) => {
                     <Text style={styles.nombreUsuario}>
                       {cal.usuario_email || 'Usuario no registrado'}
                     </Text>
-                      <Text style={styles.comentarioFecha}>
-                        {cal.fecha_calificacion?.toDate?.().toLocaleDateString() || "Sin fecha"}
+                    <Text style={styles.comentarioFecha}>
+                      {cal.fecha_calificacion?.toDate?.().toLocaleDateString() || "Sin fecha"}
+                    </Text>
+                    <View style={styles.calificacionContainer}>
+                      <FontAwesome name="star" size={16} color="#F9A825" />
+                      <Text style={styles.comentarioPuntuacion}>
+                        {" "}{cal.Calidad_servicio}
                       </Text>
-                      <View style={styles.calificacionContainer}>
-                        <FontAwesome name="star" size={16} color="#F9A825" />
-                        <Text style={styles.comentarioPuntuacion}>
-                          {" "}{cal.Calidad_servicio}
-                        </Text>
                     </View>
                     <Text style={styles.comentarioTexto}>
                       {cal.comentario || "Sin comentario"}
@@ -286,7 +284,6 @@ const ListaServicios = ({ navigation }) => {
               )}
             </ScrollView>
 
-            {/* Formulario de nueva calificación */}
             <View style={styles.formContainer}>
               <Text style={styles.formLabel}>Tu calificación:</Text>
               <View style={styles.estrellasContainer}>
@@ -329,21 +326,41 @@ const ListaServicios = ({ navigation }) => {
       </Modal>
     </View>
   );
+
+  return (
+    <FlatList
+      data={[{ id: "single-item" }]}
+      renderItem={renderContent}
+      keyExtractor={(item) => item.id}
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      ListFooterComponent={<View style={{ height: 20 }} />}
+    />
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 15,
-    paddingTop: 40,
-    backgroundColor: "#F5F7FA",
     flex: 1,
+    backgroundColor: "#F5F7FA",
   },
-  titulo: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 15,
-    color: "#0D0D0D",
-    textAlign: "center",
+  contentContainer: {
+    flexGrow: 1,
+  },
+  header: {
+    width: '100%',
+    paddingVertical: 14,
+    paddingHorizontal: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
+  },
+  headerTitle: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 26
   },
   cardRow: {
     flexDirection: "row",
@@ -526,6 +543,8 @@ const styles = StyleSheet.create({
     borderColor: "#DDD",
     marginBottom: 12,
     paddingHorizontal: 10,
+    marginHorizontal: 15,
+    marginTop: 11,
   },
   inputBusqueda: {
     flex: 1,
@@ -542,6 +561,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 12,
     gap: 6,
+    marginHorizontal: 15,
   },
   filtroBtn: {
     paddingVertical: 6,
