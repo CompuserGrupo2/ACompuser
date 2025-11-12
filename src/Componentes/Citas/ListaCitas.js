@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Platform } from "react-native";
+    import React, { useEffect, useState } from "react";
+import {View,Text,FlatList,TouchableOpacity,StyleSheet,Platform,} from "react-native";
 import { db } from "../../Database/firebaseconfig";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-import { confirmarCita, cancelarCita, posponerCita, editarCitaCliente } from "./accionesCitas";
+import {confirmarCita,cancelarCita,posponerCita,editarCitaCliente,} from "./accionesCitas";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import Icon from "react-native-vector-icons/MaterialIcons"; // ← Iconos reales
-
-const auth = getAuth();
+import LottieView from "lottie-react-native";
 
 const ListaCitas = ({ actualizarLista, rol }) => {
   const [citas, setCitas] = useState([]);
@@ -16,16 +13,29 @@ const ListaCitas = ({ actualizarLista, rol }) => {
   const [citaSeleccionada, setCitaSeleccionada] = useState(null);
   const [accionTipo, setAccionTipo] = useState("");
 
+  // === FORMATO DE FECHA Y HORA ===
+  const formatFecha = (date) => {
+    return date.toLocaleDateString("es-ES", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).replace(/\./g, "");
+  };
+
+  const formatHora = (date) => {
+    return date.toLocaleTimeString("es-ES", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
   const cargarCitas = async () => {
     try {
-      const q = query(collection(db, "Citas"), orderBy("fecha_cita", "asc"));
-      const snapshot = await getDocs(q);
+      const citasQuery = query(collection(db, "Citas"), orderBy("fecha_cita", "asc"));
+      const snapshot = await getDocs(citasQuery);
 
-      const user = auth.currentUser;
-      const nombreActual = user?.displayName || 
-        (user?.email ? user.email.split("@")[0].charAt(0).toUpperCase() + user.email.split("@")[0].slice(1) : "Anónimo");
-
-      const citas = snapshot.docs.map(doc => {
+      const datos = snapshot.docs.map((doc) => {
         const data = doc.data();
         let fechaCita;
 
@@ -37,17 +47,15 @@ const ListaCitas = ({ actualizarLista, rol }) => {
           fechaCita = new Date();
         }
 
-        const nombreUsuario = data.nombreUsuario || nombreActual;
-
         return {
           id: doc.id,
           fecha_cita: fechaCita,
           estado: data.estado || "pendiente",
-          nombreUsuario,
+          nombreUsuario: data.nombreUsuario || "Usuario no registrado",
         };
       });
 
-      setCitas(citas);
+      setCitas(datos);
     } catch (error) {
       console.error("Error al cargar citas:", error);
     }
@@ -81,7 +89,7 @@ const ListaCitas = ({ actualizarLista, rol }) => {
     }
 
     if (modoPicker === "date") {
-      setCitaSeleccionada(prev => ({ ...prev, fecha_temp: new Date(selectedDate) }));
+      setCitaSeleccionada((prev) => ({ ...prev, fecha_temp: new Date(selectedDate) }));
       if (Platform.OS === "android") setModoPicker("time");
     } else {
       const nuevaFecha = new Date(citaSeleccionada.fecha_temp);
@@ -97,26 +105,46 @@ const ListaCitas = ({ actualizarLista, rol }) => {
   };
 
   const renderItem = ({ item }) => {
-    const estadoConfig = {
-      confirmado: { icon: "check-circle", color: "#4CAF50", label: "Confirmado" },
-      pospuesta: { icon: "access-time", color: "#2196F3", label: "Pospuesto" },
-      cancelada: { icon: "cancel", color: "#f44336", label: "Cancelado" },
-      pendiente: { icon: "hourglass-empty", color: "#FF9800", label: "Pendiente" },
+    const animaciones = {
+     confirmado: require("../../../assets/animaciones/Check Mark - Success.json"),
+      pospuesta: require("../../../assets/animaciones/Clock.json"),
+      cancelada: require("../../../assets/animaciones/Cross, Close, Cancel Icon Animation.json"),
+      pendiente: require("../../../assets/animaciones/Sandy Loading.json"),
     };
 
-    const config = estadoConfig[item.estado] || estadoConfig.pendiente;
+    const colores = {
+      confirmado: "#4CAF50",
+      pospuesta: "#2196F3",
+      cancelada: "#f44336",
+      pendiente: "#FF9800",
+    };
+
+    const anim = animaciones[item.estado] || animaciones.pendiente;
+    const color = colores[item.estado] || colores.pendiente;
 
     return (
       <View style={styles.card}>
         <Text style={styles.nombre}>Cliente: {item.nombreUsuario}</Text>
-        <Text style={styles.fecha}>Fecha: {item.fecha_cita.toLocaleString()}</Text>
 
-        {/* ESTADO CON ICONO REAL */}
-        <View style={[styles.estadoBadge, { backgroundColor: config.color + "20" }]}>
-          <Icon name={config.icon} size={18} color={config.color} style={styles.estadoIcon} />
-          <Text style={[styles.estadoTexto, { color: config.color }]}>{config.label}</Text>
+        {/* FECHA Y HORA ESTÉTICAS */}
+        <Text style={styles.fechaDia}>{formatFecha(item.fecha_cita)}</Text>
+        <Text style={styles.fechaHora}>{formatHora(item.fecha_cita)}</Text>
+
+        {/* ESTADO CON ICONO ANIMADO */}
+        <View style={styles.estadoContainer}>
+          <LottieView
+            source={anim}
+            autoPlay
+            loop
+            style={{ width: 50, height: 50 }}
+            colorFilters={[{ keypath: "**", color }]}
+          />
+          <Text style={[styles.estadoTexto, { color }]}>
+            {item.estado.charAt(0).toUpperCase() + item.estado.slice(1)}
+          </Text>
         </View>
 
+        {/* BOTONES SEGÚN ROL */}
         <View style={styles.botonesContainer}>
           {rol === "Admin" ? (
             <>
@@ -177,72 +205,87 @@ const ListaCitas = ({ actualizarLista, rol }) => {
 };
 
 const styles = StyleSheet.create({
-  titulo: { 
-    fontSize: 22, 
-    fontWeight: "bold", 
-    marginBottom: 15, 
+  titulo: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 15,
     textAlign: "center",
-    color: "#2c3e50"
+    color: "#2c3e50",
   },
-  card: { 
-    backgroundColor: "#fff", 
-    padding: 18, 
-    borderRadius: 12, 
-    marginBottom: 12, 
+  card: {
+    backgroundColor: "#fff",
+    padding: 18,
+    borderRadius: 12,
+    marginBottom: 12,
     elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
   },
-  nombre: { 
-    fontSize: 16, 
-    fontWeight: "bold", 
-    color: "#2c3e50", 
-    marginBottom: 4 
+  nombre: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#2c3e50",
+    marginBottom: 4,
   },
-  fecha: { 
-    fontSize: 14, 
-    color: "#555", 
-    marginBottom: 10 
+  fechaDia: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#2c3e50",
+    marginBottom: 2,
   },
-  estadoBadge: {
+  fechaHora: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#3498db",
+    marginBottom: 10,
+  },
+  estadoContainer: {
     flexDirection: "row",
     alignItems: "center",
-    alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
     marginBottom: 12,
-  },
-  estadoIcon: {
-    marginRight: 6,
   },
   estadoTexto: {
     fontSize: 14,
     fontWeight: "bold",
+    marginLeft: 10,
   },
-  botonesContainer: { 
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-    marginTop: 5 
+  botonesContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 5,
   },
-  boton: { 
-    flex: 1, 
-    padding: 10, 
-    borderRadius: 8, 
-    marginHorizontal: 4, 
-    alignItems: "center" 
+  boton: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 8,
+    marginHorizontal: 4,
+    alignItems: "center",
   },
   botonConfirmar: { backgroundColor: "#4CAF50" },
   botonCancelar: { backgroundColor: "#f44336" },
   botonPosponer: { backgroundColor: "#2196F3" },
   botonEditar: { backgroundColor: "#FF9800" },
-  textoBoton: { 
-    color: "#fff", 
-    fontWeight: "bold", 
-    fontSize: 13 
+  textoBoton: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 13,
   },
 });
 
-export default ListaCitas;
+export default ListaCitas; 
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     

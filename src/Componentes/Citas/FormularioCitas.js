@@ -17,19 +17,16 @@ const FormularioCitas = ({ cargarCitas }) => {
 
     try {
       const user = auth.currentUser;
-      if (!user) {
-        Alert.alert("Debes iniciar sesión para agendar una cita.");
-        return;
-      }
 
-      // Nombre bonito: displayName o primera parte del email
-      const nombreUsuario = user.displayName || 
-        user.email.split("@")[0].charAt(0).toUpperCase() + user.email.split("@")[0].slice(1);
+      // Determinar nombre del usuario que agenda
+      const nombreUsuario = user
+        ? (user.displayName || user.email.split("@")[0].charAt(0).toUpperCase() + user.email.split("@")[0].slice(1))
+        : "Usuario no registrado";
 
       await addDoc(collection(db, "Citas"), {
         fecha_cita: Timestamp.fromDate(fecha),
         estado: "pendiente",
-        nombreUsuario: nombreUsuario,
+        nombreUsuario: nombreUsuario, // ← GUARDADO AL CREAR
         creado_en: Timestamp.fromDate(new Date()),
       });
 
