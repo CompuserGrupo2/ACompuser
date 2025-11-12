@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     fontSize: 22, 
     fontWeight: "bold",
     marginBottom: 12, 
-    textAlign: "center" 
+    textAlign: "row" 
   },
   card: {
     backgroundColor: "#fff",

@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, View, TouchableOpacity, Text } from "react-native";
 import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
 import ListaUsuarios from "../Componentes/Usuarios/ListaUsuarios";
 import FormularioUsuarios from "../Componentes/Usuarios/FormularioUsuarios";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient"; // AGREGADO
 
 const Usuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [usuarioId, setUsuarioId] = useState(null);
   const [nuevoUsuario, setNuevoUsuario] = useState({
@@ -56,15 +59,11 @@ const Usuarios = () => {
           rol: nuevoUsuario.rol.trim(),
           usuario: nuevoUsuario.usuario.trim(),
         });
-        setNuevoUsuario({
-          contraseña: "",
-          correo: "",
-          rol: "",
-          usuario: "",
-        });
+        setNuevoUsuario({ contraseña: "", correo: "", rol: "", usuario: "" });
         setModoEdicion(false);
         setUsuarioId(null);
         cargarDatos();
+        setModalVisible(false);
       } else {
         alert("Por favor, complete todos los campos.");
       }
@@ -87,15 +86,11 @@ const Usuarios = () => {
           rol: nuevoUsuario.rol.trim(),
           usuario: nuevoUsuario.usuario.trim(),
         });
-        setNuevoUsuario({
-          contraseña: "",
-          correo: "",
-          rol: "",
-          usuario: "",
-        });
+        setNuevoUsuario({ contraseña: "", correo: "", rol: "", usuario: "" });
         setModoEdicion(false);
         setUsuarioId(null);
         cargarDatos();
+        setModalVisible(false);
       } else {
         alert("Por favor, complete todos los campos.");
       }
@@ -113,6 +108,7 @@ const Usuarios = () => {
     });
     setUsuarioId(usuario.id);
     setModoEdicion(true);
+    setModalVisible(true);
   };
 
   useEffect(() => {
@@ -121,13 +117,31 @@ const Usuarios = () => {
 
   const renderItem = () => (
     <View>
+      {/* ENCABEZADO 100% IGUAL AL DE EQUIPOS */}
+      <LinearGradient colors={['#0057ff', '#00c6ff']} style={styles.header}>
+        <Text style={styles.headerTitle}>Usuarios</Text>
+      </LinearGradient>
+
+      <TouchableOpacity
+        style={styles.boton}
+        onPress={() => {
+          setModoEdicion(false);
+          setNuevoUsuario({ contraseña: "", correo: "", rol: "", usuario: "" });
+          setModalVisible(true);
+        }}
+      >
+        <Ionicons name="add-circle-outline" size={22} color="#fff" style={{ marginRight: 8 }} />
+        <Text style={{ color: "#fff", fontWeight: "bold" }}>Nuevo Usuario</Text>
+      </TouchableOpacity>
+
       <FormularioUsuarios
         nuevoUsuario={nuevoUsuario}
         manejoCambio={manejoCambio}
         guardarUsuario={guardarUsuario}
         actualizarUsuario={actualizarUsuario}
         modoEdicion={modoEdicion}
-        cargarDatos={cargarDatos}
+        visible={modalVisible}
+        setVisible={setModalVisible}
       />
 
       <ListaUsuarios
@@ -153,10 +167,37 @@ const Usuarios = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: "#fff",
   },
   contentContainer: {
     flexGrow: 1,
+  },
+  // ENCABEZADO COPIADO EXACTO DE EQUIPOS.JS
+  header: {
+    width: '100%',
+    paddingVertical: 14,
+    paddingHorizontal: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
+  },
+  headerTitle: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 26
+  },
+  boton: {
+    backgroundColor: "#369AD9",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 15,
+    marginTop: 25,
+    borderRadius: 10,
+    marginBottom: 20,
+    marginHorizontal: 20,
   },
 });
 

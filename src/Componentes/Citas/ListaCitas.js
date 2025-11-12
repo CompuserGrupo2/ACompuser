@@ -189,7 +189,6 @@ const ListaCitas = ({ actualizarLista, rol }) => {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={{ padding: 15 }}
-        ListHeaderComponent={<Text style={styles.titulo}>Lista de Citas</Text>}
       />
 
       {mostrarPicker && (
