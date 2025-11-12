@@ -85,26 +85,25 @@ const FormularioUsuarios = ({
 
             <TextInput
               style={styles.input}
-              placeholder="Correo"
-              value={nuevoUsuario.correo}
-              onChangeText={(v) => manejoCambio("correo", v.toLowerCase())}
-              keyboardType="email-address"
-              autoCapitalize="none"
+              placeholder="Nombre de usuario (máx. 30 caracteres)"
+              value={nuevoUsuario.usuario}
+              onChangeText={(v) => manejoCambio("usuario", v)}
             />
             <TextInput
               style={styles.input}
-              placeholder="Contraseña"
+              placeholder="Crea una contraseña (mínimo 6 caracteres)"
               value={nuevoUsuario.contraseña}
               onChangeText={(v) => manejoCambio("contraseña", v)}
               secureTextEntry
             />
             <TextInput
               style={styles.input}
-              placeholder="Usuario"
-              value={nuevoUsuario.usuario}
-              onChangeText={(v) => manejoCambio("usuario", v)}
+              placeholder="Ingresa tu correo electrónico"
+              value={nuevoUsuario.correo}
+              onChangeText={(v) => manejoCambio("correo", v.toLowerCase())}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
-
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={nuevoUsuario.rol}

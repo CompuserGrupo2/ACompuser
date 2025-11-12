@@ -84,14 +84,14 @@ const FormularioServicios = ({
 
             <TextInput
               style={styles.input}
-              placeholder="Descripción del servicio"
+              placeholder="Descripción del servicio (máx. 100 caracteres)"
               value={nuevoServicio.descripcion}
               onChangeText={(v) => manejoCambio("descripcion", v)}
             />
 
             <TextInput
               style={styles.input}
-              placeholder="Costo"
+              placeholder="Costo del servicio (solo números, máx. 2 decimales)"
               value={nuevoServicio.costo}
               onChangeText={(v) => manejoCambio("costo", v)}
               keyboardType="numeric"
@@ -99,7 +99,7 @@ const FormularioServicios = ({
 
             <TextInput
               style={styles.input}
-              placeholder="URL de la foto"
+              placeholder="URL de la imagen"
               value={nuevoServicio.foto}
               onChangeText={(v) => manejoCambio("foto", v)}
               autoCapitalize="none"

@@ -1,6 +1,6 @@
 // Servicios.js
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert } from "react-native";
 import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
 import FormularioServicios from "../Componentes/Servicios/FormularioServicios";
@@ -105,45 +105,68 @@ const Servicios = () => {
     }));
   };
 
-  const guardarServicio = async () => {
-    try {
-      if (nuevoServicio.descripcion.trim() && nuevoServicio.costo.trim() && nuevoServicio.foto.trim()) {
-        await addDoc(collection(db, "Servicios"), {
-          descripcion: nuevoServicio.descripcion.trim(),
-          costo: parseFloat(nuevoServicio.costo),
-          foto: nuevoServicio.foto.trim(),
-        });
-        setNuevoServicio({ descripcion: "", costo: "", foto: "" });
-        setModoEdicion(false);
-        setServicioId(null);
-        cargarDatos();
-        setModalVisible(false);
+  const validarDatos = async (datos) => {
+    try{
+      const response = await fetch("https://qvl4nb6q3d.execute-api.us-east-2.amazonaws.com/validarservicio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
+      });
+
+      const resultado = await response.json();
+
+      if(resultado.success) {
+        return resultado.data; //Datos limpios y validados
       } else {
-        alert("Por favor, complete todos los campos.");
+        Alert.alert("Errores en los datos", resultado.errors.join("\n"));
+        return null;
       }
     } catch (error) {
-      console.error("Error al guardar el servicio: ", error);
+      console.error("Error al validar con Lambda:", error);
+      Alert.alert("Error", "No se pudo validar la información con el servidor.");
+      return null;
+    }
+  };
+
+  const guardarServicio = async () => {
+    const datosValidados = await validarDatos(nuevoServicio);
+    if(datosValidados) {
+      try {
+        await addDoc(collection(db, "Servicios"), {
+          descripcion: datosValidados.descripcion,
+          costo: parseFloat(datosValidados.costo),
+          foto: datosValidados.foto,
+        });
+        cargarDatos();
+        setNuevoServicio({descripcion: "", costo: "", foto: "",})
+        setModoEdicion(false);
+        setServicioId(null);
+        setModalVisible(false);
+        Alert.alert("Éxito", "Servicio registrado correctamente.");
+      } catch (error) {
+        console.error("Error al registrar servicio:", error);
+      }
     }
   };
 
   const actualizarServicio = async () => {
-    try {
-      if (nuevoServicio.descripcion.trim() && nuevoServicio.costo.trim() && nuevoServicio.foto.trim()) {
+    const datosValidados = await validarDatos(nuevoServicio);
+    if (datosValidados) {
+      try {
         await updateDoc(doc(db, "Servicios", servicioId), {
-          descripcion: nuevoServicio.descripcion.trim(),
-          costo: parseFloat(nuevoServicio.costo),
-          foto: nuevoServicio.foto.trim(),
+          descripcion: datosValidados.descripcion,
+          costo: parseFloat(datosValidados.costo),
+          foto: datosValidados.foto,
         });
-        setNuevoServicio({ descripcion: "", costo: "", foto: "" });
+        setNuevoServicio({ descripcion: "", costo: "", foto: ""});
         setModoEdicion(false);
         setServicioId(null);
         cargarDatos();
         setModalVisible(false);
-      } else {
-        alert("Por favor, complete todos los campos.");
+        Alert.alert("Éxito", "Servicio actualizado correctamente.");
+      } catch (error) {
+        console.error("Error al actualizar servicio: ", error);
       }
-    } catch (error) {
-      console.error("Error al actualizar servicio: ", error);
     }
   };
 

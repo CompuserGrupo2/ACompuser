@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, View, TouchableOpacity, Text } from "react-native";
+import { FlatList, StyleSheet, View, TouchableOpacity, Text, Alert } from "react-native";
 import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
 import ListaUsuarios from "../Componentes/Usuarios/ListaUsuarios";
@@ -46,56 +46,69 @@ const Usuarios = () => {
   };
 
   const guardarUsuario = async () => {
-    try {
-      if (
-        nuevoUsuario.contraseña.trim() &&
-        nuevoUsuario.correo.trim() &&
-        nuevoUsuario.rol.trim() &&
-        nuevoUsuario.usuario.trim()
-      ) {
+    const datosValidados = await validarDatos(nuevoUsuario);
+    if(datosValidados) {
+      try {
         await addDoc(collection(db, "Usuarios"), {
-          contraseña: nuevoUsuario.contraseña.trim(),
-          correo: nuevoUsuario.correo.trim(),
-          rol: nuevoUsuario.rol.trim(),
-          usuario: nuevoUsuario.usuario.trim(),
+          contraseña: datosValidados.contraseña,
+          correo: datosValidados.correo,
+          rol: datosValidados.rol,
+          usuario: datosValidados.usuario,
         });
-        setNuevoUsuario({ contraseña: "", correo: "", rol: "", usuario: "" });
+        cargarDatos();
+        setNuevoUsuario({contraseña: "", correo: "", rol: "", usuario: "",})
         setModoEdicion(false);
         setUsuarioId(null);
-        cargarDatos();
         setModalVisible(false);
-      } else {
-        alert("Por favor, complete todos los campos.");
+        Alert.alert("Éxito", "Usuario registrado correctamente.");
+      } catch (error) {
+        console.error("Error al registrar usuario:", error);
       }
-    } catch (error) {
-      console.error("Error al guardar el usuario: ", error);
     }
   };
 
   const actualizarUsuario = async () => {
-    try {
-      if (
-        nuevoUsuario.contraseña.trim() &&
-        nuevoUsuario.correo.trim() &&
-        nuevoUsuario.rol.trim() &&
-        nuevoUsuario.usuario.trim()
-      ) {
+    const datosValidados = await validarDatos(nuevoUsuario);
+    if (datosValidados) {
+      try {
         await updateDoc(doc(db, "Usuarios", usuarioId), {
-          contraseña: nuevoUsuario.contraseña.trim(),
-          correo: nuevoUsuario.correo.trim(),
-          rol: nuevoUsuario.rol.trim(),
-          usuario: nuevoUsuario.usuario.trim(),
+          contraseña: datosValidados.contraseña,
+          correo: datosValidados.correo,
+          rol: datosValidados.rol,
+          usuario: datosValidados.usuario,
         });
         setNuevoUsuario({ contraseña: "", correo: "", rol: "", usuario: "" });
         setModoEdicion(false);
         setUsuarioId(null);
         cargarDatos();
         setModalVisible(false);
+        Alert.alert("Éxito", "Usuario actualizado correctamente.");
+      } catch (error) {
+        console.error("Error al actualizar usuario: ", error);
+      }
+    }
+  };
+
+  const validarDatos = async (datos) => {
+    try{
+      const response = await fetch("https://qvl4nb6q3d.execute-api.us-east-2.amazonaws.com/validarusuario", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
+      });
+
+      const resultado = await response.json();
+
+      if(resultado.success) {
+        return resultado.data; //Datos limpios y validados
       } else {
-        alert("Por favor, complete todos los campos.");
+        Alert.alert("Errores en los datos", resultado.errors.join("\n"));
+        return null;
       }
     } catch (error) {
-      console.error("Error al actualizar usuario: ", error);
+      console.error("Error al validar con Lambda:", error);
+      Alert.alert("Error", "No se pudo validar la información con el servidor.");
+      return null;
     }
   };
 
