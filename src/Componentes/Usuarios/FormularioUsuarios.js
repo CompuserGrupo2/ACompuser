@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   View,
   TextInput,
@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { Picker } from "@react-native-picker/picker";
+import { Ionicons } from "@expo/vector-icons";
 
 const FormularioUsuarios = ({
   nuevoUsuario,
@@ -23,6 +24,8 @@ const FormularioUsuarios = ({
   visible,
   setVisible,
 }) => {
+  const [mostrarPassword, setMostrarPassword] = useState(false);
+
   // Animaciones
   const slideAnim = useRef(new Animated.Value(300)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -89,13 +92,23 @@ const FormularioUsuarios = ({
               value={nuevoUsuario.usuario}
               onChangeText={(v) => manejoCambio("usuario", v)}
             />
+            <View style={styles.passwordContainer}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { flex: 1, marginBottom: 0, borderWidth: 0 }]}
               placeholder="Crea una contraseña (mínimo 6 caracteres)"
               value={nuevoUsuario.contraseña}
               onChangeText={(v) => manejoCambio("contraseña", v)}
-              secureTextEntry
+              secureTextEntry={!mostrarPassword}
             />
+            <TouchableOpacity onPress={() => setMostrarPassword(!mostrarPassword)}>
+                <Ionicons
+                  name={mostrarPassword ? "eye-off-outline" : "eye-outline"}
+                  size={24}
+                  color="#555"
+                  style={{ marginRight: 8 }}
+                />
+              </TouchableOpacity>
+            </View>
             <TextInput
               style={styles.input}
               placeholder="Ingresa tu correo electrónico"
@@ -160,6 +173,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9FAFB",
     borderRadius: 8,
     padding: 12,
+    marginBottom: 10,
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    backgroundColor: "#F9FAFB",
+    borderRadius: 8,
+    paddingRight: 5,
     marginBottom: 10,
   },
   pickerContainer: {

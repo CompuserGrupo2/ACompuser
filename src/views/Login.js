@@ -3,10 +3,12 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } fro
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../Database/firebaseconfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
+import { Ionicons } from '@expo/vector-icons';
 
 const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [mostrarPassword, setMostrarPassword] = useState(false);
 
   const manejarLogin = async () => {
     if (!email || !password) {
@@ -62,13 +64,23 @@ const Login = ({ onLoginSuccess }) => {
         keyboardType="email-address"
         autoCapitalize="none"
       />
+      <View style={styles.passwordContainer}>
       <TextInput
-        style={styles.input}
+        style={styles.passwordInput}
         placeholder="Contraseña"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
+        secureTextEntry={!mostrarPassword}
       />
+      <TouchableOpacity onPress={() => setMostrarPassword(!mostrarPassword)}>
+          <Ionicons
+            name={mostrarPassword ? "eye-off-outline" : "eye-outline"}
+            size={24}
+            color="#555"
+            style={{ marginLeft: 8 }}
+          />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity style={styles.boton} onPress={manejarLogin}>
         <Text style={styles.textoBoton}>Entrar</Text>
@@ -82,7 +94,7 @@ const styles = StyleSheet.create({
   container: { 
     flex: 1, 
     justifyContent: 'center', 
-    padding: 20, 
+    padding: 25, 
     alignItems: 'center', 
     backgroundColor: '#fff',
     marginBottom: 130
@@ -98,40 +110,51 @@ const styles = StyleSheet.create({
   titulo: { 
     fontSize: 24, 
     fontWeight: 'bold', 
-    textAlign: 'center',
+    color: '#1E3A8A',
     marginBottom: 15
-  },
-
-  subtitulo: { 
-    fontSize: 15, 
-    textAlign: 'center', 
-    marginBottom: 2 
-  },
-
-  subtitulos: { 
-    fontSize: 15, 
-    textAlign: 'center', 
-    marginBottom: 30 
   },
 
   input: { 
     borderWidth: 1, 
-    borderColor: "#ccc", 
-    padding: 10, 
-    borderRadius: 8, 
-    marginBottom: 10, 
-    backgroundColor: 'white', 
-    width: '100%' 
+    borderColor: "#D1D5DB", 
+    backgroundColor: '#FFFFFF',
+    padding: 12, 
+    borderRadius: 10, 
+    marginBottom: 15, 
+    width: '100%',
+    fontSize: 16
+  },
+
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    marginBottom: 15,
+    width: '100%',
+  },
+
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 16,
   },
 
   boton: { 
-    backgroundColor: '#2196F3', 
-    padding: 12, 
-    borderRadius: 8, 
+    backgroundColor: '#2563EB', 
+    paddingVertical: 14, 
+    borderRadius: 10, 
     alignItems: 'center', 
-    width: '100%' 
+    width: '100%',
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
   },
-  
+
   textoBoton: { 
     color: 'white', 
     fontSize: 18, 
