@@ -85,25 +85,25 @@ const FormularioEquipos = ({
 
             <TextInput
               style={styles.input}
-              placeholder="Color"
+              placeholder="Color (máx. 20 caracteres)"
               value={nuevoEquipo.color}
               onChangeText={(v) => manejoCambio("color", v)}
             />
             <TextInput
               style={styles.input}
-              placeholder="Marca"
+              placeholder="Marca (máx. 20 caracteres)"
               value={nuevoEquipo.marca}
               onChangeText={(v) => manejoCambio("marca", v)}
             />
             <TextInput
               style={styles.input}
-              placeholder="Modelo"
+              placeholder="Modelo (máx. 20 caracteres)"
               value={nuevoEquipo.modelo}
               onChangeText={(v) => manejoCambio("modelo", v)}
             />
             <TextInput
               style={styles.input}
-              placeholder="Tipo"
+              placeholder="Tipo (máx. 20 caracteres)"
               value={nuevoEquipo.tipo}
               onChangeText={(v) => manejoCambio("tipo", v)}
             />

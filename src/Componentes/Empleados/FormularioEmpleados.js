@@ -84,32 +84,32 @@ const FormularioEmpleados = ({
 
             <TextInput
               style={styles.input}
-              placeholder="Nombre"
+              placeholder="Nombre (máx. 20 caracteres)"
               value={nuevoEmpleado.nombre}
               onChangeText={(v) => manejoCambio("nombre", v)}
             />
             <TextInput
               style={styles.input}
-              placeholder="Apellido"
+              placeholder="Apellido (máx. 20 caracteres)"
               value={nuevoEmpleado.apellido}
               onChangeText={(v) => manejoCambio("apellido", v)}
             />
             <TextInput
               style={styles.input}
-              placeholder="Cédula"
+              placeholder="Cédula (máx. 16 caracteres)"
               value={nuevoEmpleado.cedula}
               onChangeText={(v) => manejoCambio("cedula", v)}
             />
             <TextInput
               style={styles.input}
-              placeholder="Teléfono"
+              placeholder="Teléfono (8 dígitos numéricos)"
               value={nuevoEmpleado.telefono}
               onChangeText={(v) => manejoCambio("telefono", v)}
               keyboardType="phone-pad"
             />
             <TextInput
               style={styles.input}
-              placeholder="Dirección"
+              placeholder="Dirección (máx. 120 caracteres)"
               value={nuevoEmpleado.direccion}
               onChangeText={(v) => manejoCambio("direccion", v)}
             />

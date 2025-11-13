@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert } from "react-native";
 import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
 import ListaEquipos from "../Componentes/Equipos/ListaEquipos";
@@ -46,39 +46,72 @@ const Equipos = () => {
     setNuevoEquipo((prev) => ({ ...prev, [nombre]: valor }));
   };
 
+  const validarDatos = async (datos) => {
+    try{
+      const response = await fetch("https://qvl4nb6q3d.execute-api.us-east-2.amazonaws.com/validarequipo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
+      });
+
+      const resultado = await response.json();
+
+      if(resultado.success) {
+        return resultado.data; //Datos limpios y validados
+      } else {
+        Alert.alert("Errores en los datos", resultado.errors.join("\n"));
+        return null;
+      }
+    } catch (error) {
+      console.error("Error al validar con Lambda:", error);
+      Alert.alert("Error", "No se pudo validar la información con el servidor.");
+      return null;
+    }
+  };
+
   const guardarEquipo = async () => {
-    try {
-      if (
-        nuevoEquipo.color.trim() &&
-        nuevoEquipo.marca.trim() &&
-        nuevoEquipo.modelo.trim() &&
-        nuevoEquipo.tipo.trim() &&
-        nuevoEquipo.cliente
-      ) {
-        await addDoc(collection(db, "EquipoComputarizado"), nuevoEquipo);
+    const datosValidados = await validarDatos(nuevoEquipo);
+    if(datosValidados) {
+      try {
+        await addDoc(collection(db, "EquipoComputarizado"), {
+          color: datosValidados.color,
+          marca: datosValidados.marca,
+          modelo: datosValidados.modelo,
+          tipo: datosValidados.tipo,
+          cliente: datosValidados.cliente,
+        });
+        cargarDatos();
+        setNuevoEquipo({color: "", marca: "", modelo: "", tipo: "", cliente: null})
+        setModoEdicion(false);
+        setEquipoId(null);
+        setModalVisible(false);
+        Alert.alert("Éxito", "Equipo registrado correctamente.");
+      } catch (error) {
+        console.error("Error al registrar equipo:", error);
+      }
+    }
+  };
+
+  const actualizarEquipo = async () => {
+    const datosValidados = await validarDatos(nuevoEquipo);
+    if (datosValidados) {
+      try {
+        await updateDoc(doc(db, "EquipoComputarizado", equipoId), {
+          color: datosValidados.color,
+          marca: datosValidados.marca,
+          modelo: datosValidados.modelo,
+          tipo: datosValidados.tipo,
+          cliente: datosValidados.cliente,
+        });
         setNuevoEquipo({ color: "", marca: "", modelo: "", tipo: "", cliente: null });
         setModoEdicion(false);
         setEquipoId(null);
         cargarDatos();
         setModalVisible(false);
-      } else {
-        alert("Por favor, complete todos los campos y seleccione un cliente.");
+        Alert.alert("Éxito", "Equipo actualizado correctamente.");
+      } catch (error) {
+        console.error("Error al actualizar equipo: ", error);
       }
-    } catch (error) {
-      console.error("Error al guardar el equipo: ", error);
-    }
-  };
-
-  const actualizarEquipo = async () => {
-    try {
-      await updateDoc(doc(db, "EquipoComputarizado", equipoId), nuevoEquipo);
-      setNuevoEquipo({ color: "", marca: "", modelo: "", tipo: "", cliente: null });
-      setModoEdicion(false);
-      setEquipoId(null);
-      cargarDatos();
-      setModalVisible(false);
-    } catch (error) {
-      console.error("Error al actualizar equipo: ", error);
     }
   };
 

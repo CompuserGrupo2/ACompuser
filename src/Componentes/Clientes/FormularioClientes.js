@@ -53,7 +53,9 @@ const FormularioClientes = ({
       visible={visible}
       animationType="none"
       transparent
-      onRequestClose={() => setVisible(false)}
+      onRequestClose={() => {
+        setVisible(false);
+      }}
     >
       <BlurView intensity={40} tint="dark" style={styles.overlay}>
         <Pressable style={StyleSheet.absoluteFill} onPress={() => setVisible(false)} />
@@ -76,25 +78,25 @@ const FormularioClientes = ({
 
             <TextInput
               style={styles.input}
-              placeholder="Nombre"
+              placeholder="Nombre (máx. 20 caracteres)"
               value={nuevoCliente.nombre}
               onChangeText={(valor) => manejoCambio("nombre", valor)}
             />
             <TextInput
               style={styles.input}
-              placeholder="Apellido"
+              placeholder="Apellido (máx. 20 caracteres)"
               value={nuevoCliente.apellido}
               onChangeText={(valor) => manejoCambio("apellido", valor)}
             />
             <TextInput
               style={styles.input}
-              placeholder="Cédula"
+              placeholder="Cédula (máx. 16 caracteres)"
               value={nuevoCliente.cedula}
               onChangeText={(valor) => manejoCambio("cedula", valor)}
             />
             <TextInput
               style={styles.input}
-              placeholder="Teléfono"
+              placeholder="Teléfono (8 dígitos numéricos)"
               keyboardType="phone-pad"
               value={nuevoCliente.telefono}
               onChangeText={(valor) => manejoCambio("telefono", valor)}
@@ -124,7 +126,11 @@ const FormularioClientes = ({
               </Text>
             </TouchableOpacity>
 
-            <Pressable onPress={() => setVisible(false)}>
+            <Pressable
+              onPress={() => {
+                setVisible(false);
+              }}
+            >
               <Text style={styles.cancelar}>Cancelar</Text>
             </Pressable>
           </Animated.View>

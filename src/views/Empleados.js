@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, View, TouchableOpacity, Text } from "react-native";
+import { FlatList, StyleSheet, View, TouchableOpacity, Text, Alert } from "react-native";
 import { db } from "../Database/firebaseconfig";
-import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc, terminate } from "firebase/firestore";
 import ListaEmpleados from "../Componentes/Empleados/ListaEmpleados";
 import FormularioEmpleados from "../Componentes/Empleados/FormularioEmpleados";
 import { Ionicons } from "@expo/vector-icons";
@@ -30,6 +30,75 @@ const Empleados = () => {
     }
   };
 
+  const validarDatos = async (datos) => {
+    try{
+      const response = await fetch("https://qvl4nb6q3d.execute-api.us-east-2.amazonaws.com/validarempleado", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
+      });
+
+      const resultado = await response.json();
+
+      if(resultado.success) {
+        return resultado.data; //Datos limpios y validados
+      } else {
+        Alert.alert("Errores en los datos", resultado.errors.join("\n"));
+        return null;
+      }
+    } catch (error) {
+      console.error("Error al validar con Lambda:", error);
+      Alert.alert("Error", "No se pudo validar la información con el servidor.");
+      return null;
+    }
+  };
+
+  const guardarEmpleado = async () => {
+    const datosValidados = await validarDatos(nuevoEmpleado);
+    if(datosValidados) {
+      try {
+        await addDoc(collection(db, "Empleados"), {
+          nombre: datosValidados.nombre,
+          apellido: datosValidados.apellido,
+          cedula: datosValidados.cedula,
+          telefono: datosValidados.telefono,
+          direccion: datosValidados.direccion,
+        });
+        cargarDatos();
+        setNuevoEmpleado({nombre: "", apellido: "", cedula: "", telefono: "", direccion: ""})
+        setModoEdicion(false);
+        setEmpleadoId(null);
+        setModalVisible(false);
+        Alert.alert("Éxito", "Empleado registrado correctamente.");
+      } catch (error) {
+        console.error("Error al registrar empleado:", error);
+      }
+    }
+  };
+
+  const actualizarEmpleado = async () => {
+    const datosValidados = await validarDatos(nuevoEmpleado);
+    if (datosValidados) {
+      try {
+        await updateDoc(doc(db, "Empleados", empleadoId), {
+          nombre: datosValidados.nombre,
+          apellido: datosValidados.apellido,
+          cedula: datosValidados.cedula,
+          telefono: datosValidados.telefono,
+          direccion: datosValidados.direccion,
+        });
+        setNuevoEmpleado({nombre: "", apellido: "", cedula: "", telefono: "", direccion: ""})
+        setModoEdicion(false);
+        setEmpleadoId(null);
+        cargarDatos();
+        setModalVisible(false);
+        Alert.alert("Éxito", "Empleado actualizado correctamente.");
+      } catch (error) {
+        console.error("Error al actualizar empleado: ", error);
+      }
+    }
+  };
+
   const eliminarEmpleado = async (id) => {
     try {
       await deleteDoc(doc(db, "Empleados", id));
@@ -44,76 +113,6 @@ const Empleados = () => {
       ...prev,
       [nombre]: valor,
     }));
-  };
-
-  const guardarEmpleado = async () => {
-    try {
-      if (
-        nuevoEmpleado.nombre.trim() &&
-        nuevoEmpleado.apellido.trim() &&
-        nuevoEmpleado.cedula.trim() &&
-        nuevoEmpleado.telefono.trim() &&
-        nuevoEmpleado.direccion.trim()
-      ) {
-        await addDoc(collection(db, "Empleados"), {
-          nombre: nuevoEmpleado.nombre.trim(),
-          apellido: nuevoEmpleado.apellido.trim(),
-          cedula: nuevoEmpleado.cedula.trim(),
-          telefono: nuevoEmpleado.telefono.trim(),
-          direccion: nuevoEmpleado.direccion.trim(),
-        });
-        setNuevoEmpleado({
-          nombre: "",
-          apellido: "",
-          cedula: "",
-          telefono: "",
-          direccion: "",
-        });
-        setModoEdicion(false);
-        setEmpleadoId(null);
-        cargarDatos();
-        setModalVisible(false);
-      } else {
-        alert("Por favor, complete todos los campos.");
-      }
-    } catch (error) {
-      console.error("Error al guardar el empleado: ", error);
-    }
-  };
-
-  const actualizarEmpleado = async () => {
-    try {
-      if (
-        nuevoEmpleado.nombre.trim() &&
-        nuevoEmpleado.apellido.trim() &&
-        nuevoEmpleado.cedula.trim() &&
-        nuevoEmpleado.telefono.trim() &&
-        nuevoEmpleado.direccion.trim()
-      ) {
-        await updateDoc(doc(db, "Empleados", empleadoId), {
-          nombre: nuevoEmpleado.nombre.trim(),
-          apellido: nuevoEmpleado.apellido.trim(),
-          cedula: nuevoEmpleado.cedula.trim(),
-          telefono: nuevoEmpleado.telefono.trim(),
-          direccion: nuevoEmpleado.direccion.trim(),
-        });
-        setNuevoEmpleado({
-          nombre: "",
-          apellido: "",
-          cedula: "",
-          telefono: "",
-          direccion: "",
-        });
-        setModoEdicion(false);
-        setEmpleadoId(null);
-        cargarDatos();
-        setModalVisible(false);
-      } else {
-        alert("Por favor, complete todos los campos.");
-      }
-    } catch (error) {
-      console.error("Error al actualizar empleado: ", error);
-    }
   };
 
   const editarEmpleado = (empleado) => {

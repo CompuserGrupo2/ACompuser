@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert } from "react-native";
 import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
 import FormularioClientes from "../Componentes/Clientes/FormularioClientes";
@@ -33,6 +33,32 @@ const Clientes = ({ setPantalla }) => {
     }
   };
 
+  const validarDatos = async (datos) => {
+    try {
+      const response = await fetch("https://qvl4nb6q3d.execute-api.us-east-2.amazonaws.com/validarcliente", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
+      });
+
+      const resultado = await response.json();
+
+      if (resultado.success) {
+        return resultado.data;
+      } else {
+        const mensajeErrores = resultado.errors ? resultado.errors.join("\n") : resultado.message || "Error desconocido";
+        Alert.alert("Errores en los datos", mensajeErrores);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error al validar con Lambda:", error);
+      Alert.alert("Error", "No se pudo validar la información con el servidor.");
+      return null;
+    }
+  };
+
+
+
   const eliminarCliente = async (id) => {
     try {
       await deleteDoc(doc(db, "Clientes", id));
@@ -50,55 +76,62 @@ const Clientes = ({ setPantalla }) => {
   };
 
   const guardarCliente = async () => {
-    try {
-      if (
-        nuevoCliente.nombre.trim() &&
-        nuevoCliente.apellido.trim() &&
-        nuevoCliente.cedula.trim() &&
-        nuevoCliente.telefono.trim() &&
-        nuevoCliente.tipo_cliente
-      ) {
-        await addDoc(collection(db, "Clientes"), nuevoCliente);
-        setNuevoCliente({
-          nombre: "",
-          apellido: "",
-          cedula: "",
-          telefono: "",
-          tipo_cliente: "",
+    const datosValidados = await validarDatos(nuevoCliente);
+    if(datosValidados) {
+      try {
+        await addDoc(collection(db, "Clientes"), {
+          nombre: datosValidados.nombre,
+          apellido: datosValidados.apellido,
+          cedula: datosValidados.cedula,
+          telefono: datosValidados.telefono,
+          tipo_cliente: datosValidados.tipo_cliente,
         });
+        cargarDatos();
+        setNuevoCliente({nombre: "", apellido: "", cedula: "", telefono: "", tipo_cliente: ""})
         setModoEdicion(false);
         setClienteId(null);
-        cargarDatos();
-      } else {
-        alert("Por favor, complete todos los campos.");
+        setModalVisible(false);
+        Alert.alert("Éxito", "Cliente registrado correctamente.");
+      } catch (error) {
+        console.error("Error al registrar cliente:", error);
       }
-    } catch (error) {
-      console.error("Error al guardar el cliente: ", error);
     }
   };
 
   const actualizarCliente = async () => {
-    try {
-      await updateDoc(doc(db, "Clientes", clienteId), nuevoCliente);
-      setNuevoCliente({
-        nombre: "",
-        apellido: "",
-        cedula: "",
-        telefono: "",
-        tipo_cliente: "",
-      });
-      setModoEdicion(false);
-      setClienteId(null);
-      cargarDatos();
-    } catch (error) {
-      console.error("Error al actualizar cliente: ", error);
+    const datosValidados = await validarDatos(nuevoCliente);
+    if (datosValidados) {
+      try {
+        await updateDoc(doc(db, "Clientes", clienteId), {
+          nombre: datosValidados.nombre,
+          apellido: datosValidados.apellido,
+          cedula: datosValidados.cedula,
+          telefono: datosValidados.telefono,
+          tipo_cliente: datosValidados.tipo_cliente,
+        });
+        setNuevoCliente({ nombre: "", apellido: "", cedula: "",  telefono: "", tipo_cliente: ""});
+        setModoEdicion(false);
+        setClienteId(null);
+        cargarDatos();
+        setModalVisible(false);
+        Alert.alert("Éxito", "Cliente actualizado correctamente.");
+      } catch (error) {
+        console.error("Error al actualizar cliente: ", error);
+      }
     }
   };
 
   const editarCliente = (cliente) => {
-    setNuevoCliente(cliente);
+    setNuevoCliente({
+      nombre: cliente.nombre,
+      apellido: cliente.apellido,
+      cedula: cliente.cedula,
+      telefono: cliente.telefono.toString(),
+      tipo_cliente: cliente.tipo_cliente,
+    });
     setClienteId(cliente.id);
     setModoEdicion(true);
+    setModalVisible(true);
   };
 
   useEffect(() => {
@@ -113,18 +146,19 @@ const Clientes = ({ setPantalla }) => {
       </LinearGradient>
 
       <TouchableOpacity
-        style={{
-          backgroundColor: "#369AD9",
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 15,
-          marginTop: 25,
-          borderRadius: 10,
-          marginBottom: 20,
-          marginHorizontal: 20,
+        style={ styles.boton }
+        onPress={() => {
+          setModoEdicion(false);
+          setClienteId(null);
+          setNuevoCliente({
+            nombre: "",
+            apellido: "",
+            cedula: "",
+            telefono: "",
+            tipo_cliente: "",
+          });
+          setModalVisible(true);
         }}
-        onPress={() => setModalVisible(true)}
       >
         <Ionicons name="add-circle-outline" size={22} color="#fff" style={{ marginRight: 8 }} />
         <Text style={{ color: "#fff", fontWeight: "bold" }}>Nuevo Cliente</Text>
@@ -138,15 +172,25 @@ const Clientes = ({ setPantalla }) => {
         modoEdicion={modoEdicion}
         cargarDatos={cargarDatos}
         visible={modalVisible}
-        setVisible={setModalVisible}
+        setVisible={(valor) => {
+          setModalVisible(valor);
+          if (!valor) {
+            setModoEdicion(false);
+            setClienteId(null);
+            setNuevoCliente({
+              nombre: "",
+              apellido: "",
+              cedula: "",
+              telefono: "",
+              tipo_cliente: "",
+            });
+          }
+        }}
       />
 
       <ListaClientes
         clientes={clientes}
-        editarCliente={(cliente) => {
-          editarCliente(cliente);
-          setModalVisible(true);
-        }}
+        editarCliente={editarCliente}
         cargarDatos={cargarDatos}
       />
     </View>
@@ -187,6 +231,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 26
   },
+  boton: {
+    backgroundColor: "#369AD9",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 15,
+    marginTop: 25,
+    borderRadius: 10,
+    marginBottom: 20,
+    marginHorizontal: 20,
+  }
 });
 
 export default Clientes;
