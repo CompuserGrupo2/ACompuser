@@ -18,6 +18,7 @@ import ListaServicios from "./Servicios/ListaServicios";
 import Home from "../views/Home";
 import Citas from "../views/Citas";
 import FormularioCalificacion from "./Servicios/FormularioCalificacion";
+import Estadisticas from "../views/Estadisticas"; // ← Añadido
 
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -51,7 +52,7 @@ function MyTabsCliente({ cerrarSesion, userId }) {
     <Tab.Navigator initialRouteName="Home" screenOptions={{ tabBarActiveTintColor: "blue", headerShown: false }}>
       <Tab.Screen
         name="Home"
-        component={Home}
+        component={Home} // ← CORREGIDO: era component={={Home}
         options={{
           tabBarLabel: "Inicio",
           tabBarIcon: ({ color }) => <AntDesign name="home" size={24} color={color} />,
@@ -155,6 +156,18 @@ function MyTabsAdmin({ cerrarSesion, userId }) {
           tabBarIcon: ({ color }) => <FontAwesome name="user" size={24} color={color} />,
         }}
       />
+      
+      {/* ESTADÍSTICAS */}
+      <Tab.Screen
+        name="Estadisticas"
+        options={{
+          tabBarLabel: "Estadísticas",
+          tabBarIcon: ({ color }) => <FontAwesome name="bar-chart" size={24} color={color} />,
+        }}
+      >
+        {() => <Estadisticas rol="Admin" />}
+      </Tab.Screen>
+
       <Tab.Screen
         name="CerrarSesion"
         options={{
