@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Alert, TouchableOpacity, Platform } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { auth, db } from "../../Database/firebaseconfig";
@@ -17,25 +24,27 @@ const FormularioCitas = ({ cargarCitas }) => {
 
     try {
       const user = auth.currentUser;
+      if (!user) {
+        Alert.alert("Error", "Debes iniciar sesión para agendar una cita.");
+        return;
+      }
 
-      // Determinar nombre del usuario que agenda
-      const nombreUsuario = user
-        ? (user.displayName || user.email.split("@")[0].charAt(0).toUpperCase() + user.email.split("@")[0].slice(1))
-        : "Usuario no registrado";
+      const nombreUsuario = user.displayName || user.email.split("@")[0];
 
       await addDoc(collection(db, "Citas"), {
         fecha_cita: Timestamp.fromDate(fecha),
         estado: "pendiente",
-        nombreUsuario: nombreUsuario, // ← GUARDADO AL CREAR
+        nombreUsuario: nombreUsuario,
+        userId: user.uid, // ← UID REAL (100% SEGURO)
         creado_en: Timestamp.fromDate(new Date()),
       });
 
-      Alert.alert("Cita agendada con éxito");
+      Alert.alert("¡Éxito!", "Cita agendada correctamente");
       setFecha(new Date());
       cargarCitas();
     } catch (error) {
       console.error("Error al guardar la cita:", error);
-      Alert.alert("Error", error.message);
+      Alert.alert("Error", "No se pudo agendar la cita");
     }
   };
 
@@ -65,8 +74,11 @@ const FormularioCitas = ({ cargarCitas }) => {
       <Text style={styles.titulo}>Agendar Cita</Text>
 
       <Text style={styles.label}>Fecha y Hora</Text>
-      <TouchableOpacity style={styles.inputFecha} onPress={() => mostrarSelector("date")}>
-        <Text>{fecha.toLocaleString()}</Text>
+      <TouchableOpacity
+        style={styles.inputFecha}
+        onPress={() => mostrarSelector("date")}
+      >
+        <Text>{fecha.toLocaleString("es-ES")}</Text>
       </TouchableOpacity>
 
       {mostrarPicker && (
@@ -79,7 +91,7 @@ const FormularioCitas = ({ cargarCitas }) => {
       )}
 
       <TouchableOpacity style={styles.boton} onPress={guardarCita}>
-        <Text style={styles.textoBoton}>Agendar</Text>
+        <Text style={styles.textoBoton}>Agendar Cita</Text>
       </TouchableOpacity>
     </View>
   );
@@ -112,8 +124,8 @@ const styles = StyleSheet.create({
   },
   boton: {
     backgroundColor: "#5b9ce5",
-    padding: 10,
-    borderRadius: 5,
+    padding: 12,
+    borderRadius: 8,
     alignItems: "center",
   },
   textoBoton: {

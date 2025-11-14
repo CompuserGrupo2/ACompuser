@@ -1,19 +1,37 @@
-    import React, { useEffect, useState } from "react";
-import {View,Text,FlatList,TouchableOpacity,StyleSheet,Platform,} from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  Alert,
+} from "react-native";
 import { db } from "../../Database/firebaseconfig";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
-import {confirmarCita,cancelarCita,posponerCita,editarCitaCliente,} from "./accionesCitas";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  where,
+} from "firebase/firestore";
+import {
+  confirmarCita,
+  cancelarCita,
+  posponerCita,
+  editarCitaCliente,
+} from "./accionesCitas";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import LottieView from "lottie-react-native";
 
-const ListaCitas = ({ actualizarLista, rol }) => {
+const ListaCitas = ({ actualizarLista, rol, userId }) => {
   const [citas, setCitas] = useState([]);
   const [mostrarPicker, setMostrarPicker] = useState(false);
   const [modoPicker, setModoPicker] = useState("date");
   const [citaSeleccionada, setCitaSeleccionada] = useState(null);
   const [accionTipo, setAccionTipo] = useState("");
 
-  // === FORMATO DE FECHA Y HORA ===
   const formatFecha = (date) => {
     return date.toLocaleDateString("es-ES", {
       day: "numeric",
@@ -32,7 +50,21 @@ const ListaCitas = ({ actualizarLista, rol }) => {
 
   const cargarCitas = async () => {
     try {
-      const citasQuery = query(collection(db, "Citas"), orderBy("fecha_cita", "asc"));
+      let citasQuery;
+
+      if (rol === "Admin") {
+        citasQuery = query(collection(db, "Citas"), orderBy("fecha_cita", "asc"));
+      } else if (userId) {
+        citasQuery = query(
+          collection(db, "Citas"),
+          where("userId", "==", userId),
+          orderBy("fecha_cita", "asc")
+        );
+      } else {
+        setCitas([]);
+        return;
+      }
+
       const snapshot = await getDocs(citasQuery);
 
       const datos = snapshot.docs.map((doc) => {
@@ -52,6 +84,7 @@ const ListaCitas = ({ actualizarLista, rol }) => {
           fecha_cita: fechaCita,
           estado: data.estado || "pendiente",
           nombreUsuario: data.nombreUsuario || "Usuario no registrado",
+          userId: data.userId,
         };
       });
 
@@ -63,7 +96,7 @@ const ListaCitas = ({ actualizarLista, rol }) => {
 
   useEffect(() => {
     cargarCitas();
-  }, [actualizarLista]);
+  }, [actualizarLista, userId, rol]);
 
   const handleConfirmar = async (id) => {
     await confirmarCita(id);
@@ -75,6 +108,20 @@ const ListaCitas = ({ actualizarLista, rol }) => {
     cargarCitas();
   };
 
+  const handlePosponer = (item) => {
+    Alert.alert(
+      "¿Posponer cita?",
+      `¿Estás seguro de reprogramar la cita de ${item.nombreUsuario}?`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Confirmar",
+          onPress: () => abrirPicker("posponer", item),
+        },
+      ]
+    );
+  };
+
   const abrirPicker = (tipo, cita) => {
     setCitaSeleccionada({ ...cita, fecha_temp: new Date(cita.fecha_cita) });
     setAccionTipo(tipo);
@@ -82,31 +129,44 @@ const ListaCitas = ({ actualizarLista, rol }) => {
     setMostrarPicker(true);
   };
 
-  const onChangePicker = (_, selectedDate) => {
+  const onChangePicker = async (_, selectedDate) => {
     if (!selectedDate) {
       setMostrarPicker(false);
       return;
     }
 
     if (modoPicker === "date") {
-      setCitaSeleccionada((prev) => ({ ...prev, fecha_temp: new Date(selectedDate) }));
+      setCitaSeleccionada((prev) => ({
+        ...prev,
+        fecha_temp: new Date(selectedDate),
+      }));
       if (Platform.OS === "android") setModoPicker("time");
     } else {
       const nuevaFecha = new Date(citaSeleccionada.fecha_temp);
       nuevaFecha.setHours(selectedDate.getHours());
       nuevaFecha.setMinutes(selectedDate.getMinutes());
 
-      if (accionTipo === "editar") editarCitaCliente(citaSeleccionada.id, nuevaFecha);
-      if (accionTipo === "posponer") posponerCita(citaSeleccionada.id, nuevaFecha, "Reprogramada");
-
-      setMostrarPicker(false);
-      cargarCitas();
+      try {
+        if (accionTipo === "editar") {
+          await editarCitaCliente(citaSeleccionada.id, nuevaFecha);
+          Alert.alert("Éxito", "Cita editada correctamente");
+        }
+        if (accionTipo === "posponer") {
+          await posponerCita(citaSeleccionada.id, nuevaFecha, "Reprogramada por el administrador");
+          Alert.alert("Éxito", "Cita pospuesta con éxito");
+        }
+      } catch (error) {
+        Alert.alert("Error", "No se pudo actualizar la cita");
+      } finally {
+        setMostrarPicker(false);
+        cargarCitas(); // ← SE ACTUALIZA AL INSTANTE
+      }
     }
   };
 
   const renderItem = ({ item }) => {
     const animaciones = {
-     confirmado: require("../../../assets/animaciones/Check Mark - Success.json"),
+      confirmado: require("../../../assets/animaciones/Check Mark - Success.json"),
       pospuesta: require("../../../assets/animaciones/Clock.json"),
       cancelada: require("../../../assets/animaciones/Cross, Close, Cancel Icon Animation.json"),
       pendiente: require("../../../assets/animaciones/Sandy Loading.json"),
@@ -121,16 +181,14 @@ const ListaCitas = ({ actualizarLista, rol }) => {
 
     const anim = animaciones[item.estado] || animaciones.pendiente;
     const color = colores[item.estado] || colores.pendiente;
+    const esPendiente = item.estado === "pendiente";
 
     return (
       <View style={styles.card}>
         <Text style={styles.nombre}>Cliente: {item.nombreUsuario}</Text>
-
-        {/* FECHA Y HORA ESTÉTICAS */}
         <Text style={styles.fechaDia}>{formatFecha(item.fecha_cita)}</Text>
         <Text style={styles.fechaHora}>{formatHora(item.fecha_cita)}</Text>
 
-        {/* ESTADO CON ICONO ANIMADO */}
         <View style={styles.estadoContainer}>
           <LottieView
             source={anim}
@@ -144,21 +202,30 @@ const ListaCitas = ({ actualizarLista, rol }) => {
           </Text>
         </View>
 
-        {/* BOTONES SEGÚN ROL */}
         <View style={styles.botonesContainer}>
           {rol === "Admin" ? (
             <>
-              <TouchableOpacity
-                style={[styles.boton, styles.botonConfirmar]}
-                onPress={() => handleConfirmar(item.id)}
-              >
-                <Text style={styles.textoBoton}>Confirmar</Text>
-              </TouchableOpacity>
+              {esPendiente && (
+                <TouchableOpacity
+                  style={[styles.boton, styles.botonConfirmar]}
+                  onPress={() => handleConfirmar(item.id)}
+                >
+                  <Text style={styles.textoBoton}>Confirmar</Text>
+                </TouchableOpacity>
+              )}
+
               <TouchableOpacity
                 style={[styles.boton, styles.botonPosponer]}
-                onPress={() => abrirPicker("posponer", item)}
+                onPress={() => handlePosponer(item)}
               >
                 <Text style={styles.textoBoton}>Posponer</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.boton, styles.botonCancelar]}
+                onPress={() => handleCancelar(item.id)}
+              >
+                <Text style={styles.textoBoton}>Cancelar</Text>
               </TouchableOpacity>
             </>
           ) : (
@@ -189,6 +256,11 @@ const ListaCitas = ({ actualizarLista, rol }) => {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={{ padding: 15 }}
+        ListEmptyComponent={
+          <Text style={{ textAlign: "center", color: "#777", marginTop: 20 }}>
+            No hay citas disponibles.
+          </Text>
+        }
       />
 
       {mostrarPicker && (
@@ -204,13 +276,6 @@ const ListaCitas = ({ actualizarLista, rol }) => {
 };
 
 const styles = StyleSheet.create({
-  titulo: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 15,
-    textAlign: "center",
-    color: "#2c3e50",
-  },
   card: {
     backgroundColor: "#fff",
     padding: 18,
@@ -269,22 +334,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ListaCitas; 
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
+export default ListaCitas;

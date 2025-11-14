@@ -2,24 +2,26 @@ import React, { useState } from "react";
 import { View, StyleSheet, FlatList, Text } from "react-native";
 import FormularioCitas from "../Componentes/Citas/FormularioCitas";
 import ListaCitas from "../Componentes/Citas/ListaCitas";
-import { LinearGradient } from "expo-linear-gradient"; 
+import { LinearGradient } from "expo-linear-gradient";
 
-const Citas = ({ rol }) => {
-  const [actualizarLista, setActualizarLista] = useState(false);
+const Citas = ({ rol, userId }) => {
+  const [actualizarLista, setActualizarLista] = useState(0);
+
+  const recargar = () => setActualizarLista((prev) => prev + 1);
 
   const renderItem = () => (
     <View>
-      {/* ENCABEZADO */}
       <LinearGradient colors={['#0057ff', '#00c6ff']} style={styles.header}>
         <Text style={styles.headerTitle}>Citas</Text>
       </LinearGradient>
 
-      {/* El formulario solo se muestra para CLIENTES */}
-      {rol === "Cliente" && (
-        <FormularioCitas cargarCitas={() => setActualizarLista(!actualizarLista)} />
-      )}
-      
-      <ListaCitas actualizarLista={actualizarLista} rol={rol} />
+      {rol === "Cliente" && <FormularioCitas cargarCitas={recargar} />}
+
+      <ListaCitas 
+        actualizarLista={actualizarLista} 
+        rol={rol} 
+        userId={userId} 
+      />
     </View>
   );
 

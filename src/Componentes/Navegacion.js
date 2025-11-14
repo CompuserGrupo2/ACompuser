@@ -25,7 +25,6 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 const Tab = createBottomTabNavigator();
 const StackNav = createNativeStackNavigator();
 
-// Stack interno para Servicios (Admin)
 function StackDetailServicios() {
   return (
     <StackNav.Navigator initialRouteName="ListaServiciosStack" screenOptions={{ headerShown: false }}>
@@ -37,7 +36,6 @@ function StackDetailServicios() {
   );
 }
 
-// Componente de Cerrar Sesión
 function CerrarSesionScreen({ cerrarSesion }) {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -48,8 +46,7 @@ function CerrarSesionScreen({ cerrarSesion }) {
   );
 }
 
-// Tabs CLIENTE
-function MyTabsCliente({ cerrarSesion }) {
+function MyTabsCliente({ cerrarSesion, userId }) {
   return (
     <Tab.Navigator initialRouteName="Home" screenOptions={{ tabBarActiveTintColor: "blue", headerShown: false }}>
       <Tab.Screen
@@ -75,7 +72,7 @@ function MyTabsCliente({ cerrarSesion }) {
           tabBarIcon: ({ color }) => <FontAwesome name="calendar" size={24} color={color} />,
         }}
       >
-        {() => <Citas rol="Cliente" />}
+        {() => <Citas rol="Cliente" userId={userId} />}
       </Tab.Screen>
       <Tab.Screen
         name="CerrarSesion"
@@ -90,8 +87,7 @@ function MyTabsCliente({ cerrarSesion }) {
   );
 }
 
-// Tabs ADMIN
-function MyTabsAdmin({ cerrarSesion }) {
+function MyTabsAdmin({ cerrarSesion, userId }) {
   return (
     <Tab.Navigator initialRouteName="Home" screenOptions={{ tabBarActiveTintColor: "blue", headerShown: false }}>
       <Tab.Screen
@@ -125,7 +121,7 @@ function MyTabsAdmin({ cerrarSesion }) {
           tabBarIcon: ({ color }) => <FontAwesome name="calendar" size={24} color={color} />,
         }}
       >
-        {() => <Citas rol="Admin" />}
+        {() => <Citas rol="Admin" userId={userId} />}
       </Tab.Screen>
       <Tab.Screen
         name="Clientes"
@@ -172,15 +168,17 @@ function MyTabsAdmin({ cerrarSesion }) {
   );
 }
 
-// Componente principal de navegación
 export default function Navegacion() {
   const [usuario, setUsuario] = useState(null);
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) setUsuario(user);
-      else setUsuario(null);
+      if (user) {
+        setUsuario(user);
+      } else {
+        setUsuario(null);
+      }
       setCargando(false);
     });
     return unsubscribe;
@@ -189,7 +187,7 @@ export default function Navegacion() {
   const cerrarSesion = async () => {
     try {
       await signOut(auth);
-      setUsuario(null); // esto vuelve automáticamente al login
+      setUsuario(null);
     } catch (error) {
       console.error("Error al cerrar sesión: ", error);
     }
@@ -203,14 +201,13 @@ export default function Navegacion() {
     );
   }
 
-  // Mostrar login o tabs según usuario
   return (
     <NavigationContainer>
       {usuario ? (
         usuario.rol === "Cliente" ? (
-          <MyTabsCliente cerrarSesion={cerrarSesion} />
+          <MyTabsCliente cerrarSesion={cerrarSesion} userId={usuario.uid} />
         ) : (
-          <MyTabsAdmin cerrarSesion={cerrarSesion} />
+          <MyTabsAdmin cerrarSesion={cerrarSesion} userId={usuario.uid} />
         )
       ) : (
         <Login onLoginSuccess={(userConRol) => setUsuario(userConRol)} />
