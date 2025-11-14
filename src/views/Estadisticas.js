@@ -234,9 +234,10 @@ const Estadisticas = ({ rol }) => {
   
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.customHeaderBar}>
-        <Text style={styles.customHeaderTitle}>Dashboards</Text> 
-      </View>
+       {/* ENCABEZADO */}
+      <LinearGradient colors={['#0057ff', '#00c6ff']} style={styles.header}>
+        <Text style={styles.headerTitle}>Dashboards</Text>
+      </LinearGradient>
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Tendencia de Citas (Últimos {MONTHS_TO_SHOW} meses)</Text>
@@ -306,6 +307,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f2f2f7",
   },
+    header: {
+    width: "100%",
+    paddingVertical: 14,
+    paddingHorizontal: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 5,
+  },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 26,
+  },
 
   loading: {
     flex: 1,
@@ -323,22 +339,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 10,
   },
-
-  
-  customHeaderBar: {
-    backgroundColor: '#007aff',
-    paddingTop: 45,
-    paddingBottom: 15,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-  },
   customHeaderTitle: {
     fontSize: 20,
     fontWeight: '600',
     color: '#ffffff',
   },
-
-  
   card: {
     backgroundColor: "#ffffff",
     marginHorizontal: 16,
@@ -356,13 +361,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     color: "#1c1c1e",
   },
-
-  
   chartStyle: {
     borderRadius: 16,
   },
-
-  
   ratingBarContainer: {
     marginBottom: 10,
     paddingVertical: 5,

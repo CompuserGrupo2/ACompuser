@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
-import BotonEliminarEquipo from "../Equipos/BotonEliminarEquipo"; 
+import BotonEliminarEmpleado from "../Empleados/BotonEliminarEmpleado"; 
 
 const ListaEmpleados = ({ empleados, eliminarEmpleado, editarEmpleado }) => {
   const renderItem = ({ item }) => (
@@ -20,9 +20,9 @@ const ListaEmpleados = ({ empleados, eliminarEmpleado, editarEmpleado }) => {
           <Text style={styles.icono}>✏️</Text>
         </TouchableOpacity>
 
-        <BotonEliminarEquipo
+        <BotonEliminarEmpleado
           id={item.id}
-          eliminarEquipo={eliminarEmpleado} 
+          eliminarEmpleado={eliminarEmpleado} 
         />
       </View>
     </View>
