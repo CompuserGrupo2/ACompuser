@@ -96,7 +96,7 @@ function MyTabsCliente({ cerrarSesion, userId }) {
         }}
       />
       <Tab.Screen
-        name="Catalogo"
+        name="Catálogo"
         component={ListaServicios}
         options={{
           tabBarLabel: "Catálogo",
@@ -136,8 +136,14 @@ return (
     headerShown: true,
     drawerActiveBackgroundColor: '#B2EBF2',
     drawerActiveTintColor: '#8547b7ff',
-    headerStyle: { backgroundColor: '#fcfdfeff' },
-    headerTintColor: '#0e0e0eff',
+    headerBackground: () => (
+      <LinearGradient
+        colors={['#0057ff', '#00c6ff']}
+        style={{ flex: 1 }}
+      />
+    ),
+
+    headerTintColor: '#fff',
   }}
 >
   <Drawer.Screen
