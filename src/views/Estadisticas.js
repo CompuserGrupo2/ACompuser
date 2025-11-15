@@ -234,11 +234,6 @@ const Estadisticas = ({ rol }) => {
   
   return (
     <ScrollView style={styles.container}>
-       {/* ENCABEZADO */}
-      <LinearGradient colors={['#0057ff', '#00c6ff']} style={styles.header}>
-        <Text style={styles.headerTitle}>Dashboards</Text>
-      </LinearGradient>
-
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Tendencia de Citas (Últimos {MONTHS_TO_SHOW} meses)</Text>
         <LineChart 
@@ -307,22 +302,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f2f2f7",
   },
-    header: {
-    width: "100%",
-    paddingVertical: 14,
-    paddingHorizontal: 15,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 5,
-  },
-  headerTitle: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 26,
-  },
-
   loading: {
     flex: 1,
     justifyContent: "center",

@@ -24,15 +24,6 @@ const Home = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}> 
-
-      <LinearGradient colors={['#0057ff', '#00c6ff']} style={styles.header}>
-        <Image
-          source={require('../../Imagenes/Mouse_Compuser.png')}
-          style={styles.headerLogo}
-        />
-        <Text style={styles.headerTitle}>Compuser</Text>
-      </LinearGradient>
-
       <Text style={styles.bienvenida}>
         ¡Bienvenido, {usuarioNombre || "Usuario"}! 👋
       </Text>
@@ -125,19 +116,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 5,
     
-  },
-  headerLogo: {
-    width: 45,
-    height: 45,
-    resizeMode: 'contain',
-    marginRight: 10,
-    marginTop: 6
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 8
   },
   carouselContainer: {
     width: '100%',

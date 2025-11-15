@@ -5,7 +5,6 @@ import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase
 import ListaEquipos from "../Componentes/Equipos/ListaEquipos";
 import FormularioEquipos from "../Componentes/Equipos/FormularioEquipos";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient"; 
 
 const Equipos = () => {
   const [equipos, setEquipos] = useState([]);
@@ -128,11 +127,6 @@ const Equipos = () => {
 
   const renderItem = () => (
     <View>
-      {/* ENCABEZADO */}
-      <LinearGradient colors={['#0057ff', '#00c6ff']} style={styles.header}>
-        <Text style={styles.headerTitle}>Equipos</Text>
-      </LinearGradient>
-
       <TouchableOpacity
         style={styles.boton}
         onPress={() => {
@@ -183,21 +177,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-  },
-  header: {
-    width: '100%',
-    paddingVertical: 14,
-    paddingHorizontal: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 5,
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 26
   },
   boton: {
     backgroundColor: "#369AD9",

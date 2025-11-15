@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Image,} from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -54,25 +54,43 @@ function CerrarSesionScreen({ cerrarSesion }) {
 
 function MyTabsCliente({ cerrarSesion, userId }) {
   return (
-    <Tab.Navigator
-     initialRouteName="Home"
+  <Tab.Navigator
+      initialRouteName="Home"
       screenOptions={{
-        tabBarActiveTintColor: "blue",
-        headerShown: true,
-        headerTintColor: '#fff', 
-        headerTitleStyle: { fontWeight: 'bold' },
+      headerShown: true,
+        headerTintColor: '#fff',
+        headerTitleAlign: 'center',
+
         headerBackground: () => (
           <LinearGradient
             colors={['#0057ff', '#00c6ff']}
             style={{ flex: 1 }}
           />
         ),
+
+        headerTitle: ({ children }) => (
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image
+              source={require('../../Imagenes/Mouse_Compuser.png')}
+              style={{
+                width: 40,
+                height: 40,
+                resizeMode: 'contain',
+                marginRight: 8,
+              }}
+            />
+            <Text style={{ fontSize: 20, fontWeight: "bold", color: "#fff" }}>
+              {children}
+            </Text>
+          </View>
+        ),
       }}
-    >
+      >
       <Tab.Screen
         name="Home"
-        component={Home} 
+        component={Home}  
         options={{
+          title: "Compuser",
           tabBarLabel: "Inicio",
           tabBarIcon: ({ color }) => <AntDesign name="home" size={24} color={color} />,
         }}

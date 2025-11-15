@@ -6,7 +6,6 @@ import { db } from "../../Database/firebaseconfig";
 import { collection, onSnapshot, query, addDoc, serverTimestamp } from "firebase/firestore";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
-import { LinearGradient } from "expo-linear-gradient"; // AGREGADO
 
 const ListaServicios = ({ navigation }) => {
   const [servicios, setServicios] = useState([]);
@@ -185,11 +184,6 @@ const ListaServicios = ({ navigation }) => {
 
   const renderContent = () => (
     <View>
-      {/* ENCABEZADO 100% IGUAL AL DE EQUIPOS */}
-      <LinearGradient colors={['#0057ff', '#00c6ff']} style={styles.header}>
-        <Text style={styles.headerTitle}>Catálogo de Servicios</Text>
-      </LinearGradient>
-
       <View style={styles.barraBusqueda}>
         <TextInput
           style={styles.inputBusqueda}
@@ -346,21 +340,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-  },
-  header: {
-    width: '100%',
-    paddingVertical: 14,
-    paddingHorizontal: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 5,
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 26
   },
   cardRow: {
     flexDirection: "row",

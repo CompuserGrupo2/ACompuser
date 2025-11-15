@@ -1,4 +1,3 @@
-// Servicios.js
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert } from "react-native";
 import { db } from "../Database/firebaseconfig";
@@ -8,7 +7,6 @@ import TablaServicios from "../Componentes/Servicios/TablaServicios";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient"; 
 
 const Servicios = () => {
   const [servicios, setServicios] = useState([]);
@@ -187,10 +185,6 @@ const Servicios = () => {
 
   const renderItem = () => (
     <View>
-      {/* ENCABEZADO */}
-      <LinearGradient colors={['#0057ff', '#00c6ff']} style={styles.header}>
-        <Text style={styles.headerTitle}>Servicios</Text>
-      </LinearGradient>
 
       {/* Botón Servicio */}
       <TouchableOpacity
@@ -252,21 +246,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-  },
-  header: {
-    width: '100%',
-    paddingVertical: 14,
-    paddingHorizontal: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 5,
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 26
   },
   boton: {
     backgroundColor: "#369AD9",
