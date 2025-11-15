@@ -1,13 +1,25 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, Platform } from 'react-native';
+import { getAuth } from "firebase/auth";
 
 const AcercaDeLaEmpresa = () => {
-  const navigation = useNavigation();
+  const [usuarioNombre, setUsuarioNombre] = useState('');
+
+  useEffect(() => {
+    const auth = getAuth();
+    const usuario = auth.currentUser;
+    if (usuario) {
+      setUsuarioNombre(usuario.displayName || usuario.email);
+    }
+  }, []);
 
   return (
     <View style={styles.fullContainer}>
       <View style={styles.contentContainer}>
+        <Text style={styles.bienvenida}>
+          ¡Bienvenido, {usuarioNombre || "Usuario"}! 
+        </Text>
+
         <Image
           source={require('../../Imagenes/LogoAC2.jpg')}
           style={styles.logo}
@@ -29,18 +41,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  menuButton: {
-    position: 'absolute',
-    left: 15,
-    top: Platform.OS === 'android' ? 38 : 53,
-    zIndex: 1,
-  },
   contentContainer: {
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 30,
     paddingTop: 40,
+  },
+  bienvenida: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#369AD9',
+    marginBottom: 15,
+    textAlign: 'center',
   },
   logo: {
     width: 150,
