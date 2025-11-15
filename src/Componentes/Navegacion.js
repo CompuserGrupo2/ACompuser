@@ -4,6 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from "rea
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../Database/firebaseconfig";
@@ -18,13 +19,17 @@ import ListaServicios from "./Servicios/ListaServicios";
 import Home from "../views/Home";
 import Citas from "../views/Citas";
 import FormularioCalificacion from "./Servicios/FormularioCalificacion";
-import Estadisticas from "../views/Estadisticas"; // ← Añadido
+import Estadisticas from "../views/Estadisticas"; 
+import AcercaDeLaEmpresa from "../views/AcercaDeLaEmpresa";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { LinearGradient } from 'expo-linear-gradient';
 
 const Tab = createBottomTabNavigator();
 const StackNav = createNativeStackNavigator();
+const Drawer = createDrawerNavigator();
 
 function StackDetailServicios() {
   return (
@@ -49,10 +54,24 @@ function CerrarSesionScreen({ cerrarSesion }) {
 
 function MyTabsCliente({ cerrarSesion, userId }) {
   return (
-    <Tab.Navigator initialRouteName="Home" screenOptions={{ tabBarActiveTintColor: "blue", headerShown: false }}>
+    <Tab.Navigator
+     initialRouteName="Home"
+      screenOptions={{
+        tabBarActiveTintColor: "blue",
+        headerShown: true,
+        headerTintColor: '#fff', 
+        headerTitleStyle: { fontWeight: 'bold' },
+        headerBackground: () => (
+          <LinearGradient
+            colors={['#0057ff', '#00c6ff']}
+            style={{ flex: 1 }}
+          />
+        ),
+      }}
+    >
       <Tab.Screen
         name="Home"
-        component={Home} // ← CORREGIDO: era component={={Home}
+        component={Home} 
         options={{
           tabBarLabel: "Inicio",
           tabBarIcon: ({ color }) => <AntDesign name="home" size={24} color={color} />,
@@ -88,97 +107,139 @@ function MyTabsCliente({ cerrarSesion, userId }) {
   );
 }
 
-function MyTabsAdmin({ cerrarSesion, userId }) {
-  return (
-    <Tab.Navigator initialRouteName="Home" screenOptions={{ tabBarActiveTintColor: "blue", headerShown: false }}>
-      <Tab.Screen
-        name="Home"
-        component={Home}
-        options={{
-          tabBarLabel: "Inicio",
-          tabBarIcon: ({ color }) => <AntDesign name="home" size={24} color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Servicios"
-        component={StackDetailServicios}
-        options={{
-          tabBarLabel: "Servicios",
-          tabBarIcon: ({ color }) => <FontAwesome name="wrench" size={24} color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Catalogo"
-        component={ListaServicios}
-        options={{
-          tabBarLabel: "Catálogo",
-          tabBarIcon: ({ color }) => <FontAwesome name="image" size={24} color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Citas"
-        options={{
-          tabBarLabel: "Citas",
-          tabBarIcon: ({ color }) => <FontAwesome name="calendar" size={24} color={color} />,
-        }}
-      >
-        {() => <Citas rol="Admin" userId={userId} />}
-      </Tab.Screen>
-      <Tab.Screen
-        name="Clientes"
-        component={Clientes}
-        options={{
-          tabBarLabel: "Clientes",
-          tabBarIcon: ({ color }) => <FontAwesome name="users" size={24} color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Equipos"
-        component={Equipos}
-        options={{
-          tabBarLabel: "Equipos",
-          tabBarIcon: ({ color }) => <FontAwesome name="laptop" size={24} color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Empleados"
-        component={Empleados}
-        options={{
-          tabBarLabel: "Empleados",
-          tabBarIcon: ({ color }) => <FontAwesome name="users" size={24} color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Usuarios"
-        component={Usuarios}
-        options={{
-          tabBarLabel: "Usuarios",
-          tabBarIcon: ({ color }) => <FontAwesome name="user" size={24} color={color} />,
-        }}
-      />
-      
-      {/* ESTADÍSTICAS */}
-      <Tab.Screen
-        name="Estadisticas"
-        options={{
-          tabBarLabel: "Estadísticas",
-          tabBarIcon: ({ color }) => <FontAwesome name="bar-chart" size={24} color={color} />,
-        }}
-      >
-        {() => <Estadisticas rol="Admin" />}
-      </Tab.Screen>
+function MyDrawerAdmin({ cerrarSesion, userId }) {
+  const CitasAdmin = (props) => <Citas {...props} rol="Admin" userId={userId} />;
+  const EstadisticasAdmin = (props) => <Estadisticas {...props} rol="Admin" />;
+  const LogoutScreen = (props) => <CerrarSesionScreen {...props} cerrarSesion={cerrarSesion} />;
+return (
+<Drawer.Navigator
+  initialRouteName="AcercaDeLaEmpresa"
+  screenOptions={{
+    headerShown: true,
+    drawerActiveBackgroundColor: '#B2EBF2',
+    drawerActiveTintColor: '#8547b7ff',
+    headerStyle: { backgroundColor: '#fcfdfeff' },
+    headerTintColor: '#0e0e0eff',
+  }}
+>
+  <Drawer.Screen
+    name="AcercaDeLaEmpresa"
+    component={AcercaDeLaEmpresa}
+    options={{
+      title: "Acerca de la Empresa",
+      drawerIcon: ({ color }) => (
+        <Ionicons
+          name="information-circle-outline"
+          size={24}
+          color={color}
+        />
+      ),
+      drawerLabelStyle: { fontWeight: 'bold' },
+      headerShown: true,
+      headerTitleAlign: "left",
+    }}
+  />
 
-      <Tab.Screen
-        name="CerrarSesion"
-        options={{
-          tabBarLabel: "Cerrar Sesión",
-          tabBarIcon: ({ color }) => <FontAwesome name="sign-out" size={24} color={color} />,
-        }}
-      >
-        {() => <CerrarSesionScreen cerrarSesion={cerrarSesion} />}
-      </Tab.Screen>
-    </Tab.Navigator>
-  );
+    <Drawer.Screen
+      name="ServiciosStack"
+      component={StackDetailServicios}
+      options={{
+        title: "Servicios",
+        drawerIcon: ({ color }) => (
+          <FontAwesome name="wrench" size={24} color={color} />
+        ),
+      }}
+    />
+
+    <Drawer.Screen
+      name="CitasAdmin"
+      component={CitasAdmin}
+      options={{
+        title: "Citas",
+        drawerIcon: ({ color }) => (
+          <FontAwesome name="calendar" size={24} color={color} />
+        ),
+      }}
+    />
+
+    <Drawer.Screen
+      name="CatalogoDrawer"
+      component={ListaServicios}
+      options={{
+        title: "Catálogo",
+        drawerIcon: ({ color }) => (
+          <FontAwesome name="image" size={24} color={color} />
+        ),
+      }}
+    />
+
+    <Drawer.Screen
+      name="ClientesDrawer"
+      component={Clientes}
+      options={{
+        title: "Clientes",
+        drawerIcon: ({ color }) => (
+          <FontAwesome name="users" size={24} color={color} />
+        ),
+      }}
+    />
+
+    <Drawer.Screen
+      name="EquiposDrawer"
+      component={Equipos}
+      options={{
+        title: "Equipos",
+        drawerIcon: ({ color }) => (
+          <FontAwesome name="laptop" size={24} color={color} />
+        ),
+      }}
+    />
+
+    <Drawer.Screen
+      name="EmpleadosDrawer"
+      component={Empleados}
+      options={{
+        title: "Empleados",
+        drawerIcon: ({ color }) => (
+          <FontAwesome name="users" size={24} color={color} />
+        ),
+      }}
+    />
+
+    <Drawer.Screen
+      name="UsuariosDrawer"
+      component={Usuarios}
+      options={{
+        title: "Usuarios",
+        drawerIcon: ({ color }) => (
+          <FontAwesome name="user" size={24} color={color} />
+        ),
+      }}
+    />
+
+    <Drawer.Screen
+      name="EstadisticasDrawer"
+      component={EstadisticasAdmin}
+      options={{
+        title: "Estadísticas",
+        drawerIcon: ({ color }) => (
+          <FontAwesome name="bar-chart" size={24} color={color} />
+        ),
+      }}
+    />
+
+    <Drawer.Screen
+      name="CerrarSesionDrawer"
+      component={LogoutScreen}
+      options={{
+        title: "Cerrar Sesión",
+        drawerIcon: ({ color }) => (
+          <FontAwesome name="sign-out" size={24} color={color} />
+        ),
+      }}
+    />
+  </Drawer.Navigator>
+);
 }
 
 export default function Navegacion() {
@@ -220,7 +281,7 @@ export default function Navegacion() {
         usuario.rol === "Cliente" ? (
           <MyTabsCliente cerrarSesion={cerrarSesion} userId={usuario.uid} />
         ) : (
-          <MyTabsAdmin cerrarSesion={cerrarSesion} userId={usuario.uid} />
+         <MyDrawerAdmin cerrarSesion={cerrarSesion} userId={usuario.uid} />
         )
       ) : (
         <Login onLoginSuccess={(userConRol) => setUsuario(userConRol)} />
@@ -239,5 +300,20 @@ const styles = StyleSheet.create({
   logoutText: {
     color: "white",
     fontWeight: "bold",
+  },
+    header: {
+    width: '100%',
+    paddingVertical: 14,
+    paddingHorizontal: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
+  },
+  headerTitle: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 26
   },
 });
