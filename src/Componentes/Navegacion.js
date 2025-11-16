@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {View, Text, ActivityIndicator, Image, } from "react-native";
+import {View, Text, ActivityIndicator, Image, Modal, StyleSheet, TouchableOpacity} from "react-native";
 
 import { NavigationContainer, getFocusedRouteNameFromRoute, } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -18,7 +17,6 @@ import Servicios from "../views/Servicios";
 import ListaServicios from "./Servicios/ListaServicios";
 import Home from "../views/Home";
 import Citas from "../views/Citas";
-import FormularioCalificacion from "./Servicios/FormularioCalificacion";
 import Estadisticas from "../views/Estadisticas";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -27,7 +25,6 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 
 const Tab = createBottomTabNavigator();
-const StackNav = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 const HeaderTitle = ({ title }) => (
@@ -47,85 +44,106 @@ const HeaderTitle = ({ title }) => (
   </View>
 );
 
-function StackDetailServicios() {
+function CerrarSesionModal({ visible, onCancel, onConfirm }) {
   return (
-    <StackNav.Navigator screenOptions={{ headerShown: false }}>
-      <StackNav.Screen name="ListaServiciosStack" component={Servicios} />
-      <StackNav.Screen name="Catalogo" component={ListaServicios} />
-      <StackNav.Screen name="Citas" component={Citas} />
-      <StackNav.Screen
-        name="calificaciones"
-        component={FormularioCalificacion}
-      />
-    </StackNav.Navigator>
+    <Modal transparent visible={visible} animationType="fade">
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>Cerrar sesión</Text>
+          <Text style={styles.modalMessage}>¿Estás seguro que deseas cerrar sesión?</Text>
+          <View style={styles.modalButtons}>
+            <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={onCancel}>
+              <Text style={styles.buttonText}>Cancelar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.button, styles.confirmButton]} onPress={onConfirm}>
+              <Text style={styles.buttonText}>Aceptar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
   );
 }
 
-function CerrarSesionDrawer({ cerrarSesion }) {
-  useEffect(() => {
-    cerrarSesion();
-  }, []);
-
-  return null; 
-}
-
 function MyTabsCliente({ cerrarSesion, userId }) {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleCerrarSesion = () => setModalVisible(true);
+  const handleConfirm = async () => {
+    await cerrarSesion();
+    setModalVisible(false);
+  };
+  const handleCancel = () => setModalVisible(false);
   return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: true,
-        headerTintColor: "#fff",
-        headerTitleAlign: "center",
-        headerBackground: () => (
-          <LinearGradient colors={["#0057ff", "#00c6ff"]} style={{ flex: 1 }} />
-        ),
-        headerTitle: ({ children }) => <HeaderTitle title={children} />,
-      }}
-    >
-      <Tab.Screen
-        name="Home"
-        component={Home}
-        options={{
-          title: "Inicio",
-          tabBarLabel: "Inicio",
-          tabBarIcon: ({ color }) => (
-            <AntDesign name="home" size={24} color={color} />
+    <>
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: true,
+          headerTintColor: "#fff",
+          headerTitleAlign: "center",
+          headerBackground: () => (
+            <LinearGradient colors={["#0057ff", "#00c6ff"]} style={{ flex: 1 }} />
           ),
-        }}
-      />
-      <Tab.Screen
-        name="Catálogo"
-        component={ListaServicios}
-        options={{
-          title: "Catalogo",
-          tabBarLabel: "Catalogo",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome name="image" size={24} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Citas"
-        options={{
-          title: "Citas",
-          tabBarLabel: "Citas",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome name="calendar" size={24} color={color} />
-          ),
+          headerTitle: ({ children }) => <HeaderTitle title={children} />,
         }}
       >
-        {() => <Citas rol="Cliente" userId={userId} />}
-      </Tab.Screen>
-    <Tab.Screen
-        name="CerrarSesion"
-        options={{
-          tabBarLabel: "Cerrar Sesión",
-          tabBarIcon: ({ color }) => <FontAwesome name="sign-out" size={24} color={color} />,
-        }}
-      >
-        {() => <CerrarSesionDrawer cerrarSesion={cerrarSesion} />}
-      </Tab.Screen>
-    </Tab.Navigator>
+        <Tab.Screen
+          name="Home"
+          component={Home}
+          options={{
+            title: "Inicio",
+            tabBarLabel: "Compuser",
+            tabBarIcon: ({ color }) => (
+              <AntDesign name="home" size={24} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Catálogo"
+          component={ListaServicios}
+          options={{
+            title: "Catalogo",
+            tabBarLabel: "Catalogo",
+            tabBarIcon: ({ color }) => (
+              <FontAwesome name="image" size={24} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Citas"
+          options={{
+            title: "Citas",
+            tabBarLabel: "Citas",
+            tabBarIcon: ({ color }) => (
+              <FontAwesome name="calendar" size={24} color={color} />
+            ),
+          }}
+        >
+          {() => <Citas rol="Cliente" userId={userId} />}
+        </Tab.Screen>
+        <Tab.Screen
+          name="CerrarSesionTab"
+          component={PantallaVacia}
+          options={{
+            tabBarLabel: "Cerrar Sesión",
+            tabBarIcon: ({ color }) => <FontAwesome name="sign-out" size={24} color={color} />,
+          }}
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              handleCerrarSesion();
+            },
+          }}
+        />
+      </Tab.Navigator>
+
+      {/* Modal */}
+      <CerrarSesionModal
+        visible={modalVisible}
+        onCancel={handleCancel}
+        onConfirm={handleConfirm}
+      />
+    </>
   );
 }
 
@@ -178,112 +196,170 @@ function MyTabsAdmin({ userId }) {
   );
 }
 
-function MyDrawerAdmin({ cerrarSesion, userId }) {
+function MyTabsAdmin2() {
   return (
-    <Drawer.Navigator
-      initialRouteName="PanelPrincipal"
-      screenOptions={{
-        headerShown: true,
-        drawerActiveBackgroundColor: "#d0f6fbff",
-        drawerActiveTintColor: "#0057ff",
-        headerBackground: () => (
-          <LinearGradient colors={["#0057ff", "#00c6ff"]} style={{ flex: 1 }} />
-        ),
-        headerTintColor: "#fff",
-        headerTitleAlign: "center",
-      }}
-    >
-      <Drawer.Screen
-        name="PanelPrincipal"
-        options={({ route }) => {
-          const tabName = getFocusedRouteNameFromRoute(route) ?? "InicioAdmin";
-
-          const titles = {
-            InicioAdmin: "Inicio",
-            Catálogo: "Catálogo",
-            Citas: "Citas",
-            Dashboard: "Estadísticas",
-          };
-
-          const titulo = titles[tabName] || "Compuser";
-
-          return {
-            drawerLabel: "Zona Comercial",
-            drawerIcon: ({ color }) => (
-              <Ionicons name="apps-outline" size={24} color={color} />
-            ),
-            headerTitle: () => <HeaderTitle title={titulo} />,
-          };
-        }}
-      >
-        {() => <MyTabsAdmin userId={userId} />}
-      </Drawer.Screen>
-      <Drawer.Screen
-        name="ServiciosStack"
-        component={StackDetailServicios}
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen
+        name="ServiciosAdmin"
+        component={Servicios}
         options={{
-          drawerLabel: "Servicios",
-          drawerIcon: ({ color }) => (
+          tabBarLabel: "Servicios",
+          tabBarIcon: ({ color }) => (
             <FontAwesome name="wrench" size={24} color={color} />
           ),
-          headerTitle: () => <HeaderTitle title="Servicios" />,
         }}
       />
-      <Drawer.Screen
-        name="ClientesDrawer"
+      <Tab.Screen
+        name="ClientesAdmin"
         component={Clientes}
         options={{
-          drawerLabel: "Clientes",
-          drawerIcon: ({ color }) => (
+          tabBarLabel: "Clientes",
+          tabBarIcon: ({ color }) => (
             <FontAwesome name="users" size={24} color={color} />
           ),
-          headerTitle: () => <HeaderTitle title="Clientes" />,
         }}
       />
-      <Drawer.Screen
-        name="EquiposDrawer"
+      <Tab.Screen
+        name="EquiposAdmin"
         component={Equipos}
         options={{
-          drawerLabel: "Equipos",
-          drawerIcon: ({ color }) => (
+          tabBarLabel: "Equipos",
+          tabBarIcon: ({ color }) => (
             <FontAwesome name="laptop" size={24} color={color} />
           ),
-          headerTitle: () => <HeaderTitle title="Equipos" />,
         }}
       />
-      <Drawer.Screen
-        name="EmpleadosDrawer"
+      <Tab.Screen
+        name="EmpleadosAdmin"
         component={Empleados}
         options={{
-          drawerLabel: "Empleados",
-          drawerIcon: ({ color }) => (
+          tabBarLabel: "Empleados",
+          tabBarIcon: ({ color }) => (
             <FontAwesome name="id-badge" size={24} color={color} />
           ),
-          headerTitle: () => <HeaderTitle title="Empleados" />,
         }}
       />
-      <Drawer.Screen
-        name="UsuariosDrawer"
+      <Tab.Screen
+        name="UsuariosAdmin"
         component={Usuarios}
         options={{
-          drawerLabel: "Usuarios",
-          drawerIcon: ({ color }) => (
+          tabBarLabel: "Usuarios",
+          tabBarIcon: ({ color }) => (
             <FontAwesome name="user" size={24} color={color} />
           ),
-          headerTitle: () => <HeaderTitle title="Usuarios" />,
         }}
       />
-      <Drawer.Screen
-        name="CerrarSesionDrawer"
-        options={{
-          title: "Cerrar Sesión",
-          drawerIcon: ({ color }) => <FontAwesome name="sign-out" size={24} color={color} />,
+    </Tab.Navigator>
+  );
+}
+
+
+function MyDrawerAdmin({ cerrarSesion, userId }) {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleCerrarSesion = () => setModalVisible(true);
+  const handleConfirm = async () => {
+    await cerrarSesion();
+    setModalVisible(false);
+  };
+  const handleCancel = () => setModalVisible(false);
+
+  return (
+    <>
+      <Drawer.Navigator
+        initialRouteName="PanelPrincipal"
+        screenOptions={{
+          headerShown: true,
+          drawerActiveBackgroundColor: "#d0f6fbff",
+          drawerActiveTintColor: "#0057ff",
+          headerBackground: () => (
+            <LinearGradient colors={["#0057ff", "#00c6ff"]} style={{ flex: 1 }} />
+          ),
+          headerTintColor: "#fff",
+          headerTitleAlign: "center",
         }}
       >
-        {() => <CerrarSesionDrawer cerrarSesion={cerrarSesion} />}
-      </Drawer.Screen>
-    </Drawer.Navigator>
+        <Drawer.Screen
+          name="PanelPrincipal"
+          options={({ route }) => {
+            const tabName = getFocusedRouteNameFromRoute(route) ?? "InicioAdmin";
+
+            const titles = {
+              InicioAdmin: "Compuser",
+              Catálogo: "Catálogo",
+              Citas: "Citas",
+              Dashboard: "Estadísticas",
+            };
+
+            const titulo = titles[tabName] || "Compuser";
+
+            return {
+              drawerLabel: "Zona Comercial",
+              drawerIcon: ({ color }) => (
+                <Ionicons name="apps-outline" size={24} color={color} />
+              ),
+              headerTitle: () => <HeaderTitle title={titulo} />,
+            };
+          }}
+        >
+          {() => <MyTabsAdmin userId={userId} />}
+        </Drawer.Screen>
+        <Drawer.Screen
+          name="PanelAdmin"
+          options={({ route }) => {
+            const tabName = getFocusedRouteNameFromRoute(route) ?? "ServiciosAdmin";
+
+            const titles = {
+              ServiciosAdmin: "Servicios",
+              ClientesAdmin: "Clientes",
+              EquiposAdmin: "Equipos",
+              EmpleadosAdmin: "Empleados",
+              UsuariosAdmin: "Usuarios",
+            };
+
+            const titulo = titles[tabName] || "Zona Administrativa";
+
+            return {
+              drawerLabel: "Zona Administrativa",
+              drawerIcon: ({ color }) => (
+                <Ionicons name="settings-outline" size={24} color={color} />
+              ),
+              headerTitle: () => <HeaderTitle title={titulo} />,
+            };
+          }}
+        >
+          {() => <MyTabsAdmin2 />}
+        </Drawer.Screen>
+        <Drawer.Screen
+          name="CerrarSesionDrawer"
+          component={PantallaVacia} // Pantalla vacía, no se navega a ninguna pantalla
+          options={{
+            title: "Cerrar Sesión",
+            drawerIcon: ({ color }) => (
+              <FontAwesome name="sign-out" size={24} color={color} />
+            ),
+          }}
+          listeners={{
+            drawerItemPress: (e) => {
+              e.preventDefault(); // Evita navegar
+              handleCerrarSesion(); // Muestra modal
+            },
+          }}
+        />
+      </Drawer.Navigator>
+
+      {/* Modal de cierre de sesión */}
+      <CerrarSesionModal
+        visible={modalVisible}
+        onCancel={handleCancel}
+        onConfirm={handleConfirm}
+      />
+    </>
   );
+}
+
+function PantallaVacia() {
+  return null;
 }
 
 export default function Navegacion() {
@@ -329,3 +405,50 @@ export default function Navegacion() {
     </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    width: "80%",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  button: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    marginHorizontal: 5,
+    alignItems: "center",
+  },
+  cancelButton: {
+    backgroundColor: "#ff0000",
+  },
+  confirmButton: {
+    backgroundColor: "#0057ff",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+});

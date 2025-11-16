@@ -154,7 +154,7 @@ const Login = ({ onLoginSuccess }) => {
         style={styles.input}
         placeholder="Correo electrónico"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(text) => setEmail(text.toLowerCase())}
         keyboardType="email-address"
         autoCapitalize="none"
       />
@@ -211,7 +211,7 @@ const Login = ({ onLoginSuccess }) => {
               style={styles.input}
               placeholder="Correo electrónico"
               value={nuevoCorreo}
-              onChangeText={setNuevoCorreo}
+              onChangeText={(text) => setNuevoCorreo(text.toLowerCase())}
               keyboardType="email-address"
               autoCapitalize="none"
             />
