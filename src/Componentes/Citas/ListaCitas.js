@@ -1,29 +1,11 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-  Alert,
-} from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Platform, Alert, TextInput } from "react-native";
 import { db } from "../../Database/firebaseconfig";
-import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  where,
-} from "firebase/firestore";
-import {
-  confirmarCita,
-  cancelarCita,
-  posponerCita,
-  editarCitaCliente,
-} from "./accionesCitas";
+import { collection, getDocs, query, orderBy, where } from "firebase/firestore";
+import { confirmarCita, cancelarCita, posponerCita, editarCitaCliente } from "./accionesCitas";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import LottieView from "lottie-react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const ListaCitas = ({ actualizarLista, rol, userId }) => {
   const [citas, setCitas] = useState([]);
@@ -31,6 +13,11 @@ const ListaCitas = ({ actualizarLista, rol, userId }) => {
   const [modoPicker, setModoPicker] = useState("date");
   const [citaSeleccionada, setCitaSeleccionada] = useState(null);
   const [accionTipo, setAccionTipo] = useState("");
+  const [filtro, setFiltro] = useState("");
+
+  const [busqueda, setBusqueda] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("ninguno");
+  const [filtroFecha, setFiltroFecha] = useState(null);
 
   const formatFecha = (date) => {
     return date.toLocaleDateString("es-ES", {
@@ -97,6 +84,21 @@ const ListaCitas = ({ actualizarLista, rol, userId }) => {
   useEffect(() => {
     cargarCitas();
   }, [actualizarLista, userId, rol]);
+
+  const citasFiltradas = citas.filter((cita) => {
+    const porBusqueda =
+      busqueda.trim() === "" ||
+      cita.nombreUsuario.toLowerCase().includes(busqueda.toLowerCase());
+
+    const porEstado =
+      filtroEstado === "ninguno" || filtroEstado === cita.estado;
+
+    const porFecha =
+      !filtroFecha ||
+      cita.fecha_cita.toDateString() === filtroFecha.toDateString();
+
+    return porBusqueda && porEstado && porFecha;
+  });
 
   const handleConfirmar = async (id) => {
     await confirmarCita(id);
@@ -252,14 +254,109 @@ const ListaCitas = ({ actualizarLista, rol, userId }) => {
   return (
     <View style={{ flex: 1 }}>
       <FlatList
-        data={citas}
+        data={citasFiltradas}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        contentContainerStyle={{ padding: 15 }}
+        contentContainerStyle={{ paddingBottom: 40 }}
         ListEmptyComponent={
           <Text style={{ textAlign: "center", color: "#777", marginTop: 20 }}>
             No hay citas disponibles.
           </Text>
+        }
+        ListHeaderComponent={
+          <>
+          {rol === "Admin" && (
+            <View style={styles.barraBusqueda}>
+              <TextInput
+                style={styles.inputBusqueda}
+                placeholder="Buscar cita..."
+                value={busqueda}
+                onChangeText={setBusqueda}
+              />
+              {busqueda.length > 0 && (
+                <TouchableOpacity onPress={() => setBusqueda("")} style={styles.botonBorrar}>
+                  <MaterialIcons name="close" size={20} color="#999" />
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+            <View style={styles.filtroContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.filtroBtn,
+                  filtroEstado === "confirmado" && styles.filtroActivo,
+                ]}
+                onPress={() => setFiltroEstado("confirmado")}
+              >
+                <Text
+                  style={[
+                    filtroEstado === "confirmado"
+                      ? styles.filtroActivoText
+                      : styles.filtroTexto,
+                  ]}
+                >
+                  Confirmados
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.filtroBtn,
+                  filtroEstado === "pendiente" && styles.filtroActivo,
+                ]}
+                onPress={() => setFiltroEstado("pendiente")}
+              >
+                <Text
+                  style={[
+                    filtroEstado === "pendiente"
+                      ? styles.filtroActivoText
+                      : styles.filtroTexto,
+                  ]}
+                >
+                  Pendientes
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.filtroBtn,
+                  filtroEstado === "cancelada" && styles.filtroActivo,
+                ]}
+                onPress={() => setFiltroEstado("cancelada")}
+              >
+                <Text
+                  style={[
+                    filtroEstado === "cancelada"
+                      ? styles.filtroActivoText
+                      : styles.filtroTexto,
+                  ]}
+                >
+                  Canceladas
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.filtroBtn,
+                  filtroEstado === "ninguno" && styles.filtroActivo,
+                ]}
+                onPress={() => {
+                  setFiltroEstado("ninguno");
+                  setFiltroFecha(null);
+                }}
+              >
+                <Text
+                  style={[
+                    filtroEstado === "ninguno"
+                      ? styles.filtroActivoText
+                      : styles.filtroTexto,
+                  ]}
+                >
+                  Quitar filtro
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
         }
       />
 
@@ -276,12 +373,60 @@ const ListaCitas = ({ actualizarLista, rol, userId }) => {
 };
 
 const styles = StyleSheet.create({
+  barraBusqueda: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#DDD",
+    marginBottom: 12,
+    paddingHorizontal: 10,
+    marginHorizontal: 15,
+    marginTop: 11,
+  },
+    inputBusqueda: {
+    flex: 1,
+    paddingVertical: 8,
+    fontSize: 15,
+  },
+  botonBorrar: {
+    marginLeft: 6,
+    padding: 4,
+  },
+  filtroContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    marginBottom: 12,
+    gap: 6,
+    marginHorizontal: 15,
+  },
+  filtroBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#369AD9",
+  },
+  filtroActivo: {
+    backgroundColor: "#369AD9",
+  },
+  filtroTexto: {
+    color: "#369AD9",
+    fontWeight: "600",
+  },
+  filtroActivoText: {
+    color: "#FFF",
+    fontWeight: "600",
+  },
   card: {
     backgroundColor: "#fff",
-    padding: 18,
+    padding: 12,
     borderRadius: 12,
     marginBottom: 12,
     elevation: 3,
+    marginHorizontal: 14,
   },
   nombre: {
     fontSize: 16,
@@ -296,7 +441,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   fechaHora: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#3498db",
     marginBottom: 10,
@@ -307,7 +452,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   estadoTexto: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "bold",
     marginLeft: 10,
   },
@@ -318,7 +463,7 @@ const styles = StyleSheet.create({
   },
   boton: {
     flex: 1,
-    padding: 10,
+    padding: 8,
     borderRadius: 8,
     marginHorizontal: 4,
     alignItems: "center",

@@ -12,13 +12,23 @@ import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { auth, db } from "../../Database/firebaseconfig";
 
 const FormularioCitas = ({ cargarCitas }) => {
-  const [fecha, setFecha] = useState(new Date());
+  const [fecha, setFecha] = useState(null);
   const [mostrarPicker, setMostrarPicker] = useState(false);
   const [modoPicker, setModoPicker] = useState("date");
 
   const guardarCita = async () => {
     if (!fecha) {
       Alert.alert("Por favor, seleccione una fecha y hora.");
+      return;
+    }
+
+    const ahora = new Date();
+
+    if (fecha < ahora) {
+      Alert.alert(
+        "Fecha no válida",
+        "No puedes agendar una cita en una fecha u hora pasada."
+      );
       return;
     }
 
@@ -40,7 +50,7 @@ const FormularioCitas = ({ cargarCitas }) => {
       });
 
       Alert.alert("¡Éxito!", "Cita agendada correctamente");
-      setFecha(new Date());
+      setFecha(null);
       cargarCitas();
     } catch (error) {
       console.error("Error al guardar la cita:", error);
@@ -78,12 +88,14 @@ const FormularioCitas = ({ cargarCitas }) => {
         style={styles.inputFecha}
         onPress={() => mostrarSelector("date")}
       >
-        <Text>{fecha.toLocaleString("es-ES")}</Text>
+        <Text>
+          {fecha ? fecha.toLocaleString("es-ES") : "Seleccione fecha y hora"}
+        </Text>
       </TouchableOpacity>
 
       {mostrarPicker && (
         <DateTimePicker
-          value={fecha}
+          value={fecha || new Date()}
           mode={modoPicker}
           display="default"
           onChange={onChange}

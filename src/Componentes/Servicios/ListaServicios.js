@@ -1,4 +1,3 @@
-// src/Componentes/Servicios/ListaServicios.js
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -331,6 +330,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 0,
+    marginHorizontal: 10,
   },
   iconContainer: {
     backgroundColor: "#E6E8FC",
