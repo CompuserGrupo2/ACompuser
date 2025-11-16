@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert } from "react-native";
+import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Alert } from "react-native";
 import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
 import FormularioServicios from "../Componentes/Servicios/FormularioServicios";
@@ -29,7 +29,6 @@ const Servicios = () => {
         foto: doc.data().foto || '',
       }));
       setServicios(data);
-
       if (retornar) return data;
     } catch (error) {
       console.error("Error al obtener servicios: ", error);
@@ -114,7 +113,7 @@ const Servicios = () => {
       const resultado = await response.json();
 
       if(resultado.success) {
-        return resultado.data; //Datos limpios y validados
+        return resultado.data;
       } else {
         Alert.alert("Errores en los datos", resultado.errors.join("\n"));
         return null;
@@ -183,59 +182,49 @@ const Servicios = () => {
     cargarDatos();
   }, []);
 
-  const renderItem = () => (
-    <View>
-
-      {/* Botón Servicio */}
-      <TouchableOpacity
-        style={styles.boton}
-        onPress={() => {
-          setModoEdicion(false);
-          setNuevoServicio({ descripcion: "", costo: "", foto: "" });
-          setModalVisible(true);
-        }}
-      >
-        <Ionicons name="add-circle-outline" size={22} color="#fff" style={{ marginRight: 8 }} />
-        <Text style={{ color: "#fff", fontWeight: "bold" }}>Nuevo Servicio</Text>
-      </TouchableOpacity>
-
-      {/* Modal del formulario */}
-      <FormularioServicios
-        nuevoServicio={nuevoServicio}
-        manejoCambio={manejoCambio}
-        guardarServicio={guardarServicio}
-        actualizarServicio={actualizarServicio}
-        modoEdicion={modoEdicion}
-        visible={modalVisible}
-        setVisible={setModalVisible}
-      />
-
-      {/* Botón Generar Excel */}
-      <View style={styles.botonContainer}>
-        <TouchableOpacity style={styles.botonGenerar} onPress={generarExcel}>
-          <Ionicons name="download-outline" size={22} color="#fff" style={{ marginRight: 8 }} />
-          <Text style={styles.textoBoton}>Generar Excel</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Lista de servicios */}
-      <TablaServicios
-        servicios={servicios}
-        eliminarServicio={eliminarServicio}
-        editarServicio={editarServicio}
-      />
-    </View>
-  );
-
   return (
-    <FlatList
-      data={[{ id: "single-item" }]}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      ListFooterComponent={<View style={{ height: 20 }} />}
-    />
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.contentContainer}>
+        {/* Botón Nuevo Servicio (AHORA ES UN BOTÓN NORMAL) */}
+        <TouchableOpacity
+          style={styles.boton}
+          onPress={() => {
+            setModoEdicion(false);
+            setNuevoServicio({ descripcion: "", costo: "", foto: "" });
+            setModalVisible(true);
+          }}
+        >
+          <Ionicons name="add-circle-outline" size={22} color="#fff" style={{ marginRight: 8 }} />
+          <Text style={{ color: "#fff", fontWeight: "bold" }}>Nuevo Servicio</Text>
+        </TouchableOpacity>
+
+        {/* Modal */}
+        <FormularioServicios
+          nuevoServicio={nuevoServicio}
+          manejoCambio={manejoCambio}
+          guardarServicio={guardarServicio}
+          actualizarServicio={actualizarServicio}
+          modoEdicion={modoEdicion}
+          visible={modalVisible}
+          setVisible={setModalVisible}
+        />
+
+        {/* Botón Generar Excel */}
+        <View style={styles.botonContainer}>
+          <TouchableOpacity style={styles.botonGenerar} onPress={generarExcel}>
+            <Ionicons name="download-outline" size={22} color="#fff" style={{ marginRight: 8 }} />
+            <Text style={styles.textoBoton}>Generar Excel</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Lista */}
+        <TablaServicios
+          servicios={servicios}
+          eliminarServicio={eliminarServicio}
+          editarServicio={editarServicio}
+        />
+      </ScrollView>
+    </View>
   );
 };
 
@@ -245,7 +234,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f9fa",
   },
   contentContainer: {
-    flexGrow: 1,
+    padding: 20,
+    paddingTop: 10,
   },
   boton: {
     backgroundColor: "#369AD9",
@@ -253,10 +243,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 15,
-    marginTop: 25,
     borderRadius: 10,
-    marginBottom: 20,
-    marginHorizontal: 20,
+    marginBottom: 15,
   },
   botonContainer: {
     alignItems: "center",
