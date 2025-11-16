@@ -1,7 +1,20 @@
 // src/Componentes/Servicios/ListaServicios.js
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator,
-         Modal, TextInput, Alert, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  Modal,
+  TextInput,
+  Alert,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { db } from "../../Database/firebaseconfig";
 import { collection, onSnapshot, query, addDoc, serverTimestamp } from "firebase/firestore";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
@@ -25,15 +38,14 @@ const ListaServicios = ({ navigation }) => {
 
   useEffect(() => {
     const q = query(collection(db, "Servicios"));
-
     const unsubscribe = onSnapshot(q, async (snapshot) => {
       const datosServicios = [];
 
       for (const docSnapshot of snapshot.docs) {
         const servicioData = { id: docSnapshot.id, ...docSnapshot.data() };
-
         const calificacionesRef = collection(db, "Servicios", docSnapshot.id, "Calificaciones");
-        const calificacionesSnap = await onSnapshot(calificacionesRef, (calSnapshot) => {
+
+        onSnapshot(calificacionesRef, (calSnapshot) => {
           let suma = 0;
           let cantidad = 0;
           const calificacionesLista = [];
@@ -70,7 +82,7 @@ const ListaServicios = ({ navigation }) => {
     return () => unsubscribe();
   }, []);
 
-  // Busqueda + Filtro por calificación
+  // Filtrado y búsqueda
   useEffect(() => {
     let listaFiltrada = [...servicios];
 
@@ -84,13 +96,9 @@ const ListaServicios = ({ navigation }) => {
       const calA = a.promedioCalificacion === "N/A" ? 0 : parseFloat(a.promedioCalificacion);
       const calB = b.promedioCalificacion === "N/A" ? 0 : parseFloat(b.promedioCalificacion);
 
-      if (filtroCalificacion === "mejores") {
-        return calB - calA;
-      } else if (filtroCalificacion === "peores") {
-        return calA - calB;
-      } else {
-        return 0;
-      }
+      if (filtroCalificacion === "mejores") return calB - calA;
+      if (filtroCalificacion === "peores") return calA - calB;
+      return 0;
     });
 
     setServiciosFiltrados(listaFiltrada);
@@ -103,17 +111,8 @@ const ListaServicios = ({ navigation }) => {
   };
 
   const enviarCalificacion = async () => {
-    if (!usuario) {
-      Alert.alert("Error", "Debes iniciar sesión para calificar.");
-      return;
-    }
-
-    if (calificacion < 1 || calificacion > 5) {
-      Alert.alert("Error", "Selecciona una calificación.");
-      setEnviando(false);
-      return;
-    }
-
+    if (!usuario) return Alert.alert("Error", "Debes iniciar sesión para calificar.");
+    if (calificacion < 1 || calificacion > 5) return Alert.alert("Error", "Selecciona una calificación.");
     if (enviando) return;
 
     setEnviando(true);
@@ -126,13 +125,12 @@ const ListaServicios = ({ navigation }) => {
         usuario_id: usuario.uid,
         usuario_email: usuario.email,
       });
-
       Alert.alert("Éxito", "¡Calificación enviada!");
       setComentario("");
-      setCalificacion(5);
+      setCalificacion(0);
       setModalVisible(false);
     } catch (error) {
-      console.error("Error al enviar calificación:", error);
+      console.error(error);
       Alert.alert("Error", "No se pudo enviar la calificación.");
     } finally {
       setEnviando(false);
@@ -144,7 +142,6 @@ const ListaServicios = ({ navigation }) => {
       <View style={styles.iconContainer}>
         <MaterialIcons name="build" size={26} color="#7E84F2" />
       </View>
-
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }}>
@@ -152,18 +149,14 @@ const ListaServicios = ({ navigation }) => {
             <Text style={styles.costo}>C$ {item.costo}</Text>
             <View style={styles.calificacionContainer}>
               <FontAwesome name="star" size={20} color="#F9A825" />
-              <Text style={styles.calificacion}>
-                {" "}{item.promedioCalificacion || "Sin calificación"}
-              </Text>
+              <Text style={styles.calificacion}>{item.promedioCalificacion || "Sin calificación"}</Text>
 
               <TouchableOpacity
                 style={styles.comentarioBtn}
                 onPress={() => abrirComentarios(item.calificaciones, item.id)}
               >
                 <FontAwesome name="comment" size={20} color="#369AD9" />
-                <Text style={styles.comentarioCount}>
-                  {item.calificaciones?.length || 0}
-                </Text>
+                <Text style={styles.comentarioCount}>{item.calificaciones?.length || 0}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -173,71 +166,78 @@ const ListaServicios = ({ navigation }) => {
     </View>
   );
 
-  if (cargando) {
+  if (cargando)
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#369AD9" />
         <Text>Cargando servicios...</Text>
       </View>
     );
-  }
 
-  const renderContent = () => (
-    <View>
-      <View style={styles.barraBusqueda}>
-        <TextInput
-          style={styles.inputBusqueda}
-          placeholder="Buscar servicio..."
-          value={busqueda}
-          onChangeText={setBusqueda}
-        />
-        {busqueda.length > 0 && (
-          <TouchableOpacity onPress={() => setBusqueda("")} style={styles.botonBorrar}>
-            <MaterialIcons name="close" size={20} color="#999" />
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <View style={styles.filtroContainer}>
-        <TouchableOpacity
-          style={[styles.filtroBtn, filtroCalificacion === "mejores" && styles.filtroActivo]}
-          onPress={() => setFiltroCalificacion("mejores")}
-        >
-          <Text style={filtroCalificacion === "mejores" ? styles.filtroActivoText : styles.filtroTexto}>
-            Mejores calificados
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.filtroBtn, filtroCalificacion === "peores" && styles.filtroActivo]}
-          onPress={() => setFiltroCalificacion("peores")}
-        >
-          <Text style={filtroCalificacion === "peores" ? styles.filtroActivoText : styles.filtroTexto}>
-            Peores calificados
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.filtroBtn, filtroCalificacion === "ninguno" && styles.filtroActivo]}
-          onPress={() => setFiltroCalificacion("ninguno")}
-        >
-          <Text style={filtroCalificacion === "ninguno" ? styles.filtroActivoText : styles.filtroTexto}>
-            Quitar filtro
-          </Text>
-        </TouchableOpacity>
-      </View>
-
+  return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={80}
+    >
       <FlatList
         data={serviciosFiltrados}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 40 }}
+        keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={
+          <>
+            <View style={styles.barraBusqueda}>
+              <TextInput
+                style={styles.inputBusqueda}
+                placeholder="Buscar servicio..."
+                value={busqueda}
+                onChangeText={setBusqueda}
+              />
+              {busqueda.length > 0 && (
+                <TouchableOpacity onPress={() => setBusqueda("")} style={styles.botonBorrar}>
+                  <MaterialIcons name="close" size={20} color="#999" />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <View style={styles.filtroContainer}>
+              <TouchableOpacity
+                style={[styles.filtroBtn, filtroCalificacion === "mejores" && styles.filtroActivo]}
+                onPress={() => setFiltroCalificacion("mejores")}
+              >
+                <Text style={filtroCalificacion === "mejores" ? styles.filtroActivoText : styles.filtroTexto}>
+                  Mejores calificados
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.filtroBtn, filtroCalificacion === "peores" && styles.filtroActivo]}
+                onPress={() => setFiltroCalificacion("peores")}
+              >
+                <Text style={filtroCalificacion === "peores" ? styles.filtroActivoText : styles.filtroTexto}>
+                  Peores calificados
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.filtroBtn, filtroCalificacion === "ninguno" && styles.filtroActivo]}
+                onPress={() => setFiltroCalificacion("ninguno")}
+              >
+                <Text style={filtroCalificacion === "ninguno" ? styles.filtroActivoText : styles.filtroTexto}>
+                  Quitar filtro
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        }
       />
 
-      {/* Modal de Comentarios + Formulario */}
+      {/* Modal de Comentarios */}
       <Modal
         visible={modalVisible}
-        transparent={true}
+        transparent
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
@@ -254,27 +254,19 @@ const ListaServicios = ({ navigation }) => {
               {comentariosSeleccionados.length > 0 ? (
                 comentariosSeleccionados.map((cal) => (
                   <View key={cal.id} style={styles.comentarioItem}>
-                    <Text style={styles.nombreUsuario}>
-                      {cal.usuario_email || 'Usuario no registrado'}
-                    </Text>
+                    <Text style={styles.nombreUsuario}>{cal.usuario_email || "Usuario no registrado"}</Text>
                     <Text style={styles.comentarioFecha}>
                       {cal.fecha_calificacion?.toDate?.().toLocaleDateString() || "Sin fecha"}
                     </Text>
                     <View style={styles.calificacionContainer}>
                       <FontAwesome name="star" size={16} color="#F9A825" />
-                      <Text style={styles.comentarioPuntuacion}>
-                        {" "}{cal.Calidad_servicio}
-                      </Text>
+                      <Text style={styles.comentarioPuntuacion}> {cal.Calidad_servicio}</Text>
                     </View>
-                    <Text style={styles.comentarioTexto}>
-                      {cal.comentario || "Sin comentario"}
-                    </Text>
+                    <Text style={styles.comentarioTexto}>{cal.comentario || "Sin comentario"}</Text>
                   </View>
                 ))
               ) : (
-                <Text style={styles.sinComentariosModal}>
-                  No hay comentarios aún. ¡Sé el primero!
-                </Text>
+                <Text style={styles.sinComentariosModal}>No hay comentarios aún. ¡Sé el primero!</Text>
               )}
             </ScrollView>
 
@@ -282,10 +274,7 @@ const ListaServicios = ({ navigation }) => {
               <Text style={styles.formLabel}>Tu calificación:</Text>
               <View style={styles.estrellasContainer}>
                 {[1, 2, 3, 4, 5].map((estrella) => (
-                  <TouchableOpacity
-                    key={estrella}
-                    onPress={() => setCalificacion(estrella)}
-                  >
+                  <TouchableOpacity key={estrella} onPress={() => setCalificacion(estrella)}>
                     <FontAwesome
                       name={estrella <= calificacion ? "star" : "star-o"}
                       size={28}
@@ -310,26 +299,13 @@ const ListaServicios = ({ navigation }) => {
                 onPress={enviarCalificacion}
                 disabled={enviando}
               >
-                <Text style={styles.btnText}>
-                  {enviando ? "Enviando..." : "Enviar Calificación"}
-                </Text>
+                <Text style={styles.btnText}>{enviando ? "Enviando..." : "Enviar Calificación"}</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
-    </View>
-  );
-
-  return (
-    <FlatList
-      data={[{ id: "single-item" }]}
-      renderItem={renderContent}
-      keyExtractor={(item) => item.id}
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      ListFooterComponent={<View style={{ height: 20 }} />}
-    />
+    </KeyboardAvoidingView>
   );
 };
 
