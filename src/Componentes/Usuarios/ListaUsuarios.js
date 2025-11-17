@@ -10,20 +10,21 @@ const ListaUsuarios = ({ usuarios, eliminarUsuario, editarUsuario }) => {
         <Text style={styles.correo}>{item.correo}</Text>
         <Text style={styles.rol}>{item.rol}</Text>
       </View>
+      {/*
+        <View style={styles.accionesContainer}>
+          <TouchableOpacity
+            style={styles.botonActualizar}
+            onPress={() => editarUsuario(item)}
+          >
+            <Text style={styles.icono}>✏️</Text>
+          </TouchableOpacity>
 
-      <View style={styles.accionesContainer}>
-        <TouchableOpacity
-          style={styles.botonActualizar}
-          onPress={() => editarUsuario(item)}
-        >
-          <Text style={styles.icono}>✏️</Text>
-        </TouchableOpacity>
-
-        <BotonEliminarUsuario
-          id={item.id}
-          eliminarUsuario={eliminarUsuario}
-        />
-      </View>
+          <BotonEliminarUsuario
+            id={item.id}
+            eliminarUsuario={eliminarUsuario}
+          />
+        </View>
+      */}
     </View>
   );
 

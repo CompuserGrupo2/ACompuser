@@ -18,6 +18,7 @@ import ListaServicios from "./Servicios/ListaServicios";
 import Home from "../views/Home";
 import Citas from "../views/Citas";
 import Estadisticas from "../views/Estadisticas";
+import Perfil from "../views/Perfil";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -110,6 +111,17 @@ function MyTabsCliente({ cerrarSesion, userId }) {
           }}
         />
         <Tab.Screen
+          name="Perfil"
+          component={Perfil}
+          options={{
+            title: "Perfil",
+            tabBarLabel: "Perfil",
+            tabBarIcon: ({ color }) => (
+              <FontAwesome name="user" size={24} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
           name="Citas"
           options={{
             title: "Citas",
@@ -167,6 +179,17 @@ function MyTabsAdmin({ userId }) {
           tabBarLabel: "Catálogo",
           tabBarIcon: ({ color }) => (
             <FontAwesome name="image" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Perfil"
+        component={Perfil}
+        options={{
+          title: "Perfil",
+          tabBarLabel: "Perfil",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="user" size={24} color={color} />
           ),
         }}
       />
@@ -287,6 +310,7 @@ function MyDrawerAdmin({ cerrarSesion, userId }) {
             const titles = {
               InicioAdmin: "Compuser",
               Catálogo: "Catálogo",
+              Perfil: "Perfil",
               Citas: "Citas",
               Dashboard: "Estadísticas",
             };

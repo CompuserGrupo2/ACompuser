@@ -17,14 +17,9 @@ const Login = ({ onLoginSuccess }) => {
   const [nuevoUsuario, setNuevoUsuario] = useState("");
   const [mostrarPasswordRegistro, setMostrarPasswordRegistro] = useState(false);
 
-  // VALIDACIÓN DE NOMBRE DE USUARIO (solo letras, máximo 20 caracteres)
+  // VALIDACIÓN DE NOMBRE DE USUARIO (Máximo 20 caracteres)
   const validarNombreUsuario = (texto) => {
     if (!texto) return false;
-    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
-    if (!regex.test(texto)) {
-      Alert.alert("Error", "El nombre solo puede contener letras y espacios.");
-      return false;
-    }
     if (texto.length > 20) {
       Alert.alert("Error", "El nombre no puede exceder los 20 caracteres.");
       return false;

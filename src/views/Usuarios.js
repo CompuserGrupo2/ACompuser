@@ -5,6 +5,8 @@ import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase
 import ListaUsuarios from "../Componentes/Usuarios/ListaUsuarios";
 import FormularioUsuarios from "../Componentes/Usuarios/FormularioUsuarios";
 import { Ionicons } from "@expo/vector-icons";
+import { auth } from "../Database/firebaseconfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const Usuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -48,11 +50,20 @@ const Usuarios = () => {
     const datosValidados = await validarDatos(nuevoUsuario);
     if(datosValidados) {
       try {
+        const credencial = await createUserWithEmailAndPassword(
+        auth,
+        datosValidados.correo.toLowerCase(),
+        datosValidados.contraseña
+        );
+
+        const uidFirebase = credencial.user.uid;
+
         await addDoc(collection(db, "Usuarios"), {
           contraseña: datosValidados.contraseña,
           correo: datosValidados.correo,
           rol: datosValidados.rol,
           usuario: datosValidados.usuario,
+          uid: uidFirebase,
         });
         cargarDatos();
         setNuevoUsuario({contraseña: "", correo: "", rol: "", usuario: "",})
