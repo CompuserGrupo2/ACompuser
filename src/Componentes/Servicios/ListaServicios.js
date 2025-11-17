@@ -19,7 +19,7 @@ import { collection, onSnapshot, query, addDoc, serverTimestamp } from "firebase
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
 
-const ListaServicios = ({ navigation }) => {
+const ListaServicios = ({ navigation, modoInvitado = false }) => {
   const [servicios, setServicios] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -110,6 +110,9 @@ const ListaServicios = ({ navigation }) => {
   };
 
   const enviarCalificacion = async () => {
+    if (modoInvitado) {
+      return Alert.alert("Invitado", "Debes registrarte o iniciar sesión para calificar.");
+    }
     if (!usuario) return Alert.alert("Error", "Debes iniciar sesión para calificar.");
     if (calificacion < 1 || calificacion > 5) return Alert.alert("Error", "Selecciona una calificación.");
     if (enviando) return;
@@ -273,7 +276,10 @@ const ListaServicios = ({ navigation }) => {
               <Text style={styles.formLabel}>Tu calificación:</Text>
               <View style={styles.estrellasContainer}>
                 {[1, 2, 3, 4, 5].map((estrella) => (
-                  <TouchableOpacity key={estrella} onPress={() => setCalificacion(estrella)}>
+                  <TouchableOpacity
+                    key={estrella}
+                    onPress={() => modoInvitado ? Alert.alert("Invitado", "Debes registrarte para calificar.") : setCalificacion(estrella)}
+                  >
                     <FontAwesome
                       name={estrella <= calificacion ? "star" : "star-o"}
                       size={28}
@@ -286,20 +292,28 @@ const ListaServicios = ({ navigation }) => {
 
               <TextInput
                 style={styles.inputComentario}
-                placeholder="Escribe tu comentario (opcional)"
+                placeholder={modoInvitado ? "Debes registrarte para comentar" : "Escribe tu comentario (opcional)"}
                 value={comentario}
-                onChangeText={setComentario}
+                onChangeText={modoInvitado ? () => {} : setComentario}
                 multiline
                 numberOfLines={3}
+                editable={!modoInvitado}
               />
+              {!modoInvitado && (
+                <TouchableOpacity
+                  style={[styles.btnEnviar, enviando && { opacity: 0.6 }]}
+                  onPress={enviarCalificacion}
+                  disabled={enviando}
+                >
+                  <Text style={styles.btnText}>{enviando ? "Enviando..." : "Enviar Calificación"}</Text>
+                </TouchableOpacity>
+              )}
 
-              <TouchableOpacity
-                style={[styles.btnEnviar, enviando && { opacity: 0.6 }]}
-                onPress={enviarCalificacion}
-                disabled={enviando}
-              >
-                <Text style={styles.btnText}>{enviando ? "Enviando..." : "Enviar Calificación"}</Text>
-              </TouchableOpacity>
+              {modoInvitado && (
+                <Text style={{ textAlign: "center", color: "#777", marginTop: 10 }}>
+                  Estás en modo invitado: solo puedes visualizar calificaciones y comentarios.
+                </Text>
+              )}
             </View>
           </View>
         </View>

@@ -159,6 +159,166 @@ function MyTabsCliente({ cerrarSesion, userId }) {
   );
 }
 
+function MyTabsInvitado({ onLoginRedirect }) {
+  const [modalInfoVisible, setModalInfoVisible] = useState(false);
+  const [modalLoginVisible, setModalLoginVisible] = useState(false);
+  const [targetTab, setTargetTab] = useState(""); // Para saber si Perfil o Citas
+
+  // Modal para Perfil o Citas
+  const handleRestrictedTab = (tabName) => {
+    setTargetTab(tabName);
+    setModalInfoVisible(true);
+  };
+
+  // Modal para Iniciar sesión
+  const handleLoginTab = () => {
+    setModalLoginVisible(true);
+  };
+
+  return (
+    <>
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: true,
+          headerTintColor: "#fff",
+          headerTitleAlign: "center",
+          headerBackground: () => (
+            <LinearGradient colors={["#0057ff", "#00c6ff"]} style={{ flex: 1 }} />
+          ),
+          headerTitle: ({ children }) => <HeaderTitle title={children} />,
+        }}
+      >
+        <Tab.Screen
+          name="Home"
+          component={Home}
+          options={{
+            title: "Inicio",
+            tabBarLabel: "Inicio",
+            tabBarIcon: ({ color }) => <AntDesign name="home" size={24} color={color} />,
+          }}
+        />
+        <Tab.Screen
+          name="Catálogo"
+          options={{
+            title: "Catálogo",
+            tabBarLabel: "Catálogo",
+            tabBarIcon: ({ color }) => <FontAwesome name="image" size={24} color={color} />,
+          }}
+        >
+          {() => <ListaServicios modoInvitado={true} />}
+        </Tab.Screen>
+        <Tab.Screen
+          name="Perfil"
+          component={PantallaVacia}
+          options={{
+            title: "Perfil",
+            tabBarLabel: "Perfil",
+            tabBarIcon: ({ color }) => <FontAwesome name="user" size={24} color={color} />,
+          }}
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              handleRestrictedTab("Perfil");
+            },
+          }}
+        />
+        <Tab.Screen
+          name="Citas"
+          component={PantallaVacia}
+          options={{
+            title: "Citas",
+            tabBarLabel: "Citas",
+            tabBarIcon: ({ color }) => <FontAwesome name="calendar" size={24} color={color} />,
+          }}
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              handleRestrictedTab("Citas");
+            },
+          }}
+        />
+        <Tab.Screen
+          name="IniciarSesion"
+          component={PantallaVacia}
+          options={{
+            title: "Iniciar sesión",
+            tabBarLabel: "Iniciar sesión",
+            tabBarIcon: ({ color }) => <FontAwesome name="sign-in" size={24} color={color} />,
+          }}
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              handleLoginTab();
+            },
+          }}
+        />
+      </Tab.Navigator>
+
+      {/* Modal Perfil y Citas */}
+      <Modal transparent visible={modalInfoVisible} animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Acceso restringido</Text>
+            <Text style={styles.modalMessage}>
+              Para acceder a {targetTab}, necesitas registrarte o iniciar sesión.
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.button, styles.cancelButton]}
+                onPress={() => {
+                  setModalInfoVisible(false);
+                }}
+              >
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.confirmButton]}
+                onPress={() => {
+                  setModalInfoVisible(false);
+                  onLoginRedirect();
+                }}
+              >
+                <Text style={styles.buttonText}>Aceptar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal Iniciar sesión */}
+      <Modal transparent visible={modalLoginVisible} animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Iniciar sesión</Text>
+            <Text style={styles.modalMessage}>
+              ¿Estás seguro de que quieres iniciar sesión?
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.button, styles.cancelButton]}
+                onPress={() => {
+                  setModalLoginVisible(false);
+                }}
+              >
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.confirmButton]}
+                onPress={() => {
+                  setModalLoginVisible(false);
+                  onLoginRedirect();
+                }}
+              >
+                <Text style={styles.buttonText}>Aceptar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </>
+  );
+}
+
 function MyTabsAdmin({ userId }) {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
@@ -420,9 +580,11 @@ export default function Navegacion() {
       {usuario ? (
         usuario.rol === "Cliente" ? (
           <MyTabsCliente cerrarSesion={cerrarSesion} userId={usuario.uid} />
-        ) : (
+        ) : usuario.rol === "Admin" ? (
           <MyDrawerAdmin cerrarSesion={cerrarSesion} userId={usuario.uid} />
-        )
+        ) : usuario.rol === "Invitado" ? (
+          <MyTabsInvitado onLoginRedirect={() => setUsuario(null)} />
+        ) : null
       ) : (
         <Login onLoginSuccess={(userConRol) => setUsuario(userConRol)} />
       )}

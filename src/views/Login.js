@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, Modal } from 'react-native';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously  } from 'firebase/auth';
 import { auth, db } from '../Database/firebaseconfig';
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
@@ -102,7 +102,7 @@ const Login = ({ onLoginSuccess }) => {
     }
   };
 
-  // LOGIN NORMAL (CORREGIDO: manejarLogin sin acento)
+  // LOGIN NORMAL
   const manejarLogin = async () => {
     if (!email.trim() || !password) {
       Alert.alert("Error", "Por favor completa ambos campos.");
@@ -134,6 +134,21 @@ const Login = ({ onLoginSuccess }) => {
       else if (error.code === "auth/user-not-found") mensaje = "Usuario no encontrado.";
       else if (error.code === "auth/wrong-password") mensaje = "Contraseña incorrecta.";
       Alert.alert("Error", mensaje);
+    }
+  };
+
+  // LOGIN COMO INVITADO
+  const entrarComoInvitado = async () => {
+    try {
+      const userCredential = await signInAnonymously(auth);
+      const user = userCredential.user;
+
+      // Enviar rol temporal de invitado al componente padre
+      onLoginSuccess({ uid: user.uid, rol: "Invitado" });
+      
+    } catch (error) {
+      console.log("Error al entrar como invitado:", error);
+      Alert.alert("Error", "No se pudo iniciar sesión como invitado.");
     }
   };
 
@@ -183,6 +198,14 @@ const Login = ({ onLoginSuccess }) => {
         onPress={() => setModalRegistro(true)}
       >
         <Text style={styles.textoBoton}>Crear Cuenta</Text>
+      </TouchableOpacity>
+
+      {/* BOTÓN ENTRAR COMO INVITADO */}
+      <TouchableOpacity 
+        style={[styles.botonEntrar, { backgroundColor: "#9CA3AF" }]}
+        onPress={entrarComoInvitado}
+      >
+        <Text style={styles.textoBoton}>Entrar como Invitado</Text>
       </TouchableOpacity>
 
       {/* MODAL DE REGISTRO */}
