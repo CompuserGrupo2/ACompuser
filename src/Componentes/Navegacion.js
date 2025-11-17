@@ -6,7 +6,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "../Database/firebaseconfig";
+import { auth, db } from "../Database/firebaseconfig";
+import { doc, getDoc } from "firebase/firestore";
 
 import Login from "../views/Login";
 import Usuarios from "../views/Usuarios";
@@ -551,11 +552,16 @@ export default function Navegacion() {
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUsuario(user || null);
-      setCargando(false);
-    });
-    return unsubscribe;
+    // Al iniciar la app, cerramos sesión automáticamente para que siempre inicie en Login
+    const resetAuth = async () => {
+      try {
+        await signOut(auth); // esto asegura que no quede usuario logueado de sesiones previas
+      } catch (error) {
+        console.log("No hay usuario logueado al iniciar");
+      }
+      setCargando(false); // ya podemos mostrar Login
+    };
+    resetAuth();
   }, []);
 
   const cerrarSesion = async () => {
@@ -577,17 +583,19 @@ export default function Navegacion() {
 
   return (
     <NavigationContainer>
-      {usuario ? (
-        usuario.rol === "Cliente" ? (
-          <MyTabsCliente cerrarSesion={cerrarSesion} userId={usuario.uid} />
-        ) : usuario.rol === "Admin" ? (
-          <MyDrawerAdmin cerrarSesion={cerrarSesion} userId={usuario.uid} />
-        ) : usuario.rol === "Invitado" ? (
-          <MyTabsInvitado onLoginRedirect={() => setUsuario(null)} />
-        ) : null
-      ) : (
-        <Login onLoginSuccess={(userConRol) => setUsuario(userConRol)} />
-      )}
+      {!usuario ? (
+        // Login inicial
+        <Login
+          onLoginSuccess={(userConRol) => setUsuario(userConRol)} // Cliente o Admin
+          onLoginInvitado={() => setUsuario({ rol: "Invitado" })} // Acceder como invitado
+        />
+      ) : usuario.rol === "Cliente" ? (
+        <MyTabsCliente cerrarSesion={() => setUsuario(null)} userId={usuario.uid} />
+      ) : usuario.rol === "Admin" ? (
+        <MyDrawerAdmin cerrarSesion={() => setUsuario(null)} userId={usuario.uid} />
+      ) : usuario.rol === "Invitado" ? (
+        <MyTabsInvitado onLoginRedirect={() => setUsuario(null)} />
+      ) : null}
     </NavigationContainer>
   );
 }

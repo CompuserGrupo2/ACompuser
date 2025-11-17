@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     padding: 25, 
     alignItems: 'center', 
     backgroundColor: '#fff',
-    marginBottom: 130
+    marginBottom: 50
   },
 
   logo: { 

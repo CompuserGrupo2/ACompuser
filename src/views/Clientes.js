@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert } from "react-native";
+import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert, KeyboardAvoidingView, Platform } from "react-native";
 import { db } from "../Database/firebaseconfig";
 import { collection, getDocs, doc, deleteDoc, addDoc, updateDoc } from "firebase/firestore";
 import FormularioClientes from "../Componentes/Clientes/FormularioClientes";
@@ -133,6 +133,13 @@ const Clientes = ({ setPantalla }) => {
     setModalVisible(true);
   };
 
+  const resetFormulario = () => {
+    setNuevoCliente({ nombre: "", apellido: "", cedula: "", telefono: "", tipo_cliente: "" });
+    setModoEdicion(false);
+    setClienteId(null);
+    setModalVisible(false);
+  };
+
   useEffect(() => {
     cargarDatos();
   }, []);
@@ -158,30 +165,6 @@ const Clientes = ({ setPantalla }) => {
         <Text style={{ color: "#fff", fontWeight: "bold" }}>Nuevo Cliente</Text>
       </TouchableOpacity>
 
-      <FormularioClientes
-        nuevoCliente={nuevoCliente}
-        manejoCambio={manejoCambio}
-        guardarCliente={guardarCliente}
-        actualizarCliente={actualizarCliente}
-        modoEdicion={modoEdicion}
-        cargarDatos={cargarDatos}
-        visible={modalVisible}
-        setVisible={(valor) => {
-          setModalVisible(valor);
-          if (!valor) {
-            setModoEdicion(false);
-            setClienteId(null);
-            setNuevoCliente({
-              nombre: "",
-              apellido: "",
-              cedula: "",
-              telefono: "",
-              tipo_cliente: "",
-            });
-          }
-        }}
-      />
-
       <ListaClientes
         clientes={clientes}
         editarCliente={editarCliente}
@@ -191,14 +174,29 @@ const Clientes = ({ setPantalla }) => {
   );
 
   return (
-    <FlatList
-      data={[{ id: "single-item" }]}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      ListFooterComponent={<View style={{ height: 20 }} />}
-    />
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <FlatList
+        data={[{ id: "single-item" }]}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        ListFooterComponent={<View style={{ height: 20 }} />}
+      />
+      <FormularioClientes
+        nuevoCliente={nuevoCliente}
+        manejoCambio={manejoCambio}
+        guardarCliente={guardarCliente}
+        actualizarCliente={actualizarCliente}
+        modoEdicion={modoEdicion}
+        cargarDatos={cargarDatos}
+        visible={modalVisible}
+        setVisible={(valor) => (valor ? setModalVisible(true) : resetFormulario())}
+      />
+    </KeyboardAvoidingView>
   );
 };
 
