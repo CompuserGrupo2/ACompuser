@@ -217,6 +217,7 @@ const Perfil = () => {
             {/* Contraseña actual para reautenticación */}
             <View style={styles.inputContainer}>
               <TextInput
+                key={mostrarActual}
                 style={styles.passwordInput}
                 placeholder="Ingrese contraseña actual"
                 secureTextEntry={!mostrarActual}
@@ -236,6 +237,7 @@ const Perfil = () => {
             {/* Nueva contraseña */}
             <View style={styles.inputContainer}>
               <TextInput
+                key={mostrarNueva} 
                 style={styles.passwordInput}
                 placeholder="Ingrese nueva contraseña"
                 secureTextEntry={!mostrarNueva}
@@ -271,6 +273,7 @@ const Perfil = () => {
 
             <View style={styles.inputContainer}>
               <TextInput
+                key={mostrarEliminar}
                 style={styles.passwordInput}
                 placeholder="Ingresa tu contraseña actual"
                 secureTextEntry={!mostrarEliminar}

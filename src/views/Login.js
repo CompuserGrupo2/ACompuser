@@ -171,6 +171,7 @@ const Login = ({ onLoginSuccess }) => {
 
       <View style={styles.passwordContainer}>
         <TextInput
+          key={mostrarPassword}
           style={styles.passwordInput}
           placeholder="Contraseña"
           value={password}
@@ -237,6 +238,7 @@ const Login = ({ onLoginSuccess }) => {
             {/* CONTRASEÑA CON MOSTRAR/OCULTAR */}
             <View style={styles.passwordContainer}>
               <TextInput
+                key={mostrarPasswordRegistro}
                 style={styles.passwordInput}
                 placeholder="Contraseña"
                 value={nuevoPassword}

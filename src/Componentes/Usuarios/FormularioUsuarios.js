@@ -94,6 +94,7 @@ const FormularioUsuarios = ({
             />
             <View style={styles.passwordContainer}>
             <TextInput
+              key={mostrarPassword}
               style={[styles.input, { flex: 1, marginBottom: 0, borderWidth: 0 }]}
               placeholder="Crea una contraseña (mínimo 6 caracteres)"
               value={nuevoUsuario.contraseña}
