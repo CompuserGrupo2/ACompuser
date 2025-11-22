@@ -24,6 +24,18 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "FIREBASE_API_KEY": "AIzaSyBqQJDFURJIO0VWuxhGu4XMGv7EYIsXtMg",
+      "FIREBASE_AUTH_DOMAIN": "compuser-8.firebaseapp.com",
+      "FIREBASE_PROJECT_ID": "compuser-8",
+      "FIREBASE_STORAGE_BUCKET": "compuser-8.firebasestorage.app",
+      "FIREBASE_MESSAGING_SENDER_ID": "256638902226",
+      "FIREBASE_APP_ID": "1:256638902226:android:5bfc517113fd02c41ef20b",
+      "FIREBASE_MEASUREMENT_ID": "G-H1XHXEJH3T",
+      "eas": {
+        "projectId": "499400dc-85d3-47c4-b0e5-1758163f1377"
+      }
     }
   }
 }
