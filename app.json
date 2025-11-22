@@ -21,7 +21,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "packege": "com.compuser.miapp"
+      "package": "com.compuser.miapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
